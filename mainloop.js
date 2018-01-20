@@ -24,7 +24,7 @@ function start() {
     // no available world, generate one
     console.log("world:", state);
 
-    if (!state) {
+    if (!state || !state.world) {
       state = newWorld();
       SendWorld(state);
     }
