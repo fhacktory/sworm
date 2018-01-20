@@ -418,16 +418,10 @@ var init = function(){
     canvas_width = parseInt(canvas.attr('width'));
     canvas_height = parseInt(canvas.attr('height'));
      
-    //create the level
-    createBoxes();
-    
-	// create the players
-	spawnPlayers();
     //click event handler on our world
 	/*
     canvas.click( function(e) {
         var p = get_real(new b2Vec2(e.clientX / scale, e.clientY / scale));
-			
     });
 	*/
      
