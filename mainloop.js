@@ -1,5 +1,5 @@
-let WorldMaxBlockX = 15;
-let WorldMaxBlockY = 15;
+let WorldMaxBlockX = 20;
+let WorldMaxBlockY = 20;
 let MaxNewBlocks = 5;
 let TurnDelay = 15000;
 
@@ -61,6 +61,7 @@ function start() {
 }
 
 function newWorld() {
+  console.log("newWorld()");
   let bs = [];
   for (let i = 0; i < WorldMaxBlockX; i++) {
     bs.push({
@@ -150,9 +151,8 @@ function setWorld(state) {
   for (let idx in state.world) {
     let b = state.world[idx];
 
-		var x = (b.x * boxWidth * 2) + (boxWidth);
-		var y = 60 + (boxWidth) + (b.y * boxWidth * 2);
-    console.log(b.x);
+		var x = (b.x * boxWidth) + (boxWidth/2);
+		var y = 60 + (boxWidth/2) + (b.y * boxWidth);
 
 		var options = {
 			path: 'wall',

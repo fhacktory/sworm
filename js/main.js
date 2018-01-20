@@ -429,8 +429,7 @@ var init = function(){
 };
 init();
 
-
-
-
 // points d'entrée
 window.playerShoot = _playerShoot;
+
+start();
