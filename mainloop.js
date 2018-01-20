@@ -1,7 +1,7 @@
 let WorldMaxBlockX = 20;
 let WorldMaxBlockY = 20;
 let MaxNewBlocks = 5;
-let TurnDelay = 15000;
+let TurnDelay = 5000;
 
 let firstCall = true;
 let timeout = null;
@@ -33,7 +33,7 @@ function start() {
         type: "spawn",
         time: firebase.database.ServerValue.TIMESTAMP,
         position: {
-          x: Math.random() % 100,
+          x: Math.random() * 100,
           y: 600,
         }
       }
@@ -41,7 +41,7 @@ function start() {
       SendAction(playerName, action)
     }
 
-    timeout = setTimeout(function() { send(state) }, 15000);
+    timeout = setTimeout(function() { send(state) }, TurnDelay);
 
     console.log("created timeout", timeout);
     SubscribeActions(function(actions) {
@@ -59,7 +59,7 @@ function start() {
           let a = actions[key];
           console.log("state", s.time);
           console.log("a", a.time);
-          if (s.time - 13000 > a.time) {
+          if (s.time - TurnDelay - 1000 > a.time) {
             delete actionsQueue[key];
           }
         }
@@ -81,12 +81,12 @@ function start() {
 function interrupt(state) {
   timeout = clearTimeout(timeout);
 
-  newState = simulation(state);
+  let newState = simulation(state);
   console.log("after simulation");
   console.log(state);
   console.log("interrupt");
 
-  timeout = setTimeout(function() { send(newState) }, 15000);
+  timeout = setTimeout(function() { send(newState) }, TurnDelay);
 }
 
 function setPlayers(state) {
@@ -201,10 +201,11 @@ function setWorld(state) {
 // simulation of all players after having retrieved
 // them from firebase.
 function simulation(state) {
+  let newState = state;
   // simulate all players action
   for (idx in actionsQueue) {
     let action = actionsQueue[idx];
-    newState = simulate(state, action);
+    newState = simulate(newState, action);
   }
   actionsQueue = [];
   return newState;
