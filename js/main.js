@@ -35,25 +35,28 @@ var ctx;
 var canvas_width;
 var canvas_height;
 var gameObjects = [];
+var to_destroy = [];
 var boxWidth = 30;
 
 var images = {};
 
-var prepareImages = function(){
-
-};
-
 var get_offset = function(vector) {
 	return new b2Vec2(vector.x - 0, Math.abs(vector.y - this.canvas_height));
+}
+
+var performDestroy = function() {
+	
+	for (var i = 0, l = to_destroy.length; i<l; i++){
+		var o = to_destroy[i];
+		console.log("destroying ...", o);
+		destroyObjectFromScene(o);
+	}
+	to_destroy = [];
 }
  
 //box2d to canvas scale , therefor 1 metre of box2d = 100px of canvas :)
 var scale = 100;
- 
-/*
-    Draw a world
-    this method is called in a loop to redraw the world
-*/  
+
 var draw_world = function (world, context) {
 	//console.log("draw_world");
     //first clear the canvas
@@ -143,13 +146,25 @@ var spawnPlayer = function(options){
 	gameObjects.push(box);
 };
 
-var destroyObject = function(o){
+var destroyObjectFromScene = function(o){
 	if(o.body == null) {
 		return;
+	}
+	for (var i = 0, l = gameObjects.length; i<l; i++){
+		var gameObject = gameObjects[i];
+		if (o === gameObject){
+			//alert(1);
+			gameObjects.splice(i, 1);
+			break;
+		}
 	}
 	o.body.GetWorld().DestroyBody( o.body );
 	o.body = null;
 	//o.dead = true;
+};
+
+var destroyObject = function(o){
+	to_destroy.push(o);
 };
 
 var setupCollisionHandler = function(){
@@ -159,20 +174,39 @@ var setupCollisionHandler = function(){
 		var a = contact.GetFixtureA().GetUserData();
 		var b = contact.GetFixtureB().GetUserData();
 		
-		if (a.type == "rocket" && b.type == "player"){
-			console.log("collision", a, b);
+		if (a.type == "rocket" && a.active != false && b.type == "wall"){
+			a.active = false;
+			destroyObject(a);
+			destroyObject(b);
+		}
+		if (b.type == "rocket" && b.active != false && a.type == "wall"){
+			b.active = false;
+			destroyObject(b);
+			destroyObject(a);
+		}
+		//console.log(a.active, a.type, b.type);
+		if (a.type == "rocket" && a.active != false && b.type == "player"){
 			if (a.owner != b.playerId){
+				a.active = false;
 				destroyObject(a);
 				b.path = "player-dead";
 			}
-			
 		}
-		if (b.type == "rocket" && a.type == "player"){
-			console.log("collision", a, b);
+		//console.log(b.active, a.type, b.type);
+		if (b.type == "rocket" && b.active != false && a.type == "player"){
 			if (b.owner != a.playerId){
+				b.active = false;
 				destroyObject(b);
 				a.path = "player-dead";
 			}
+		}
+		if (a.type == "rocket" && a.active != false && b.type == "ground"){
+			a.active = false;
+			destroyObject(a);
+		}
+		if (b.type == "rocket" && b.active != false && a.type == "ground"){
+			b.active = false;
+			destroyObject(b);
 		}
 	}
 };
@@ -180,8 +214,7 @@ var setupCollisionHandler = function(){
 
  
 //Create box2d world object
-function createWorld() 
-{
+function createWorld() {
     //Gravity vector x, y - 10 m/s2 - thats earth!!
     var gravity = new b2Vec2(0, -10);
      
@@ -276,9 +309,29 @@ var createBoxes = function () {
 	}
 }
 
+var _removeBox = function(x, y){
+	for (var i = 0, l = gameObjects.length; i<l; i++){
+		var gameObject = gameObjects[i];
+		if (gameObject.type != "wall"){
+			continue;
+		}
+		var position = gameObject.body.GetPosition();
+		
+		var wallX = Math.round(position.x * scale);
+		var wallY = Math.round(position.y * scale);
+		
+		if (wallX == x && wallY == y){
+			destroyObject(gameObject);
+			return;
+		}
+	}
+	console.log("_removeBox::Impossible de supprimer la box", x, y);
+};
+
 var _addBox = function(x, y){
 	var options = {
-		path: 'wall',
+		type: "wall",
+		path: "wall",
 		x: x,
 		y: y,
 		width: boxWidth,
@@ -343,6 +396,9 @@ var step = function () {
     //move the world ahead , step ahead man!!
     world.Step(timeStep , 8 , 3);
     world.ClearForces();
+			
+	//garbage collect dead things
+	performDestroy();
      
     draw_world(world, ctx);
 };
@@ -363,7 +419,7 @@ var _playerShoot = function(playerName, vx, vy){
 	}
 	var playerPosition = player.body.GetPosition();
 	var playerPositionX = (playerPosition.x * scale) + (player.width / 2);
-	var playerPositionY = (playerPosition.y * scale) + (player.height / 2);
+	var playerPositionY = (playerPosition.y * scale) + (player.height);
 	var options = {
 		owner: player.playerId,
 		type: 'rocket',
@@ -388,7 +444,6 @@ var _playerShoot = function(playerName, vx, vy){
 // main entry point
 var init = function(){
 	
-	prepareImages();
     var canvas = $('#canvas');
     ctx = canvas.get(0).getContext('2d');
      
@@ -413,6 +468,7 @@ init();
 // points d'entrée
 window.playerShoot = _playerShoot;
 window.addBox = _addBox;
+window.removeBox = _removeBox;
 
 start();
 
