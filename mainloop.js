@@ -20,7 +20,7 @@ function start() {
 
     setWorld(state);
 
-    spawnPlayers();
+    setPlayers(state);
 
     // puts the player somewhere in the world
 
@@ -47,6 +47,21 @@ function start() {
     // TODO(remy): error handling
     console.error("start:", error);
   });
+}
+
+function setPlayers(state) {
+  for (idx in state.players) {
+    let player = state.players[idx];
+
+		var x = player.x * (boxWidth * 2) + boxWidth
+		var options = {
+			playerId: player.name,
+			x: x,
+			y: 500
+		};
+
+		spawnPlayer(options);
+  }
 }
 
 function newWorld() {
@@ -121,6 +136,9 @@ function run() {
       return;
     }
 
+    // redraw the world
+    updateWorld(state);
+
     // wait for the end of the turn and execute
     let wait = state.next_turn - new Date().getTime();
     if (wait < 0) {
@@ -136,12 +154,29 @@ function run() {
   });
 }
 
+function updateWorld(state) {
+  for (let idx in state.world) {
+    let b = state.world[idx];
+    let block = getBlock(state, b.x, b.y);
+
+	  var x = (b.x * boxWidth) + (boxWidth/2);
+	  var y = (28) + (boxWidth/2) + (b.y * boxWidth);
+
+    if (block.type === "sky" && b.type === "ground") {
+      // add
+      window.addBox(x, y);
+    } else if (block.type === "ground" && b.type === "sky") {
+      window.removeBox(x, y);
+    }
+  }
+}
+
 function setWorld(state) {
   for (let idx in state.world) {
     let b = state.world[idx];
-	var x = (b.x * boxWidth) + (boxWidth/2);
-	var y = (28) + (boxWidth/2) + (b.y * boxWidth);
-	window.addBox(x, y);
+    var x = (b.x * boxWidth) + (boxWidth/2);
+    var y = (28) + (boxWidth/2) + (b.y * boxWidth);
+    window.addBox(x, y);
   }
 }
 
@@ -163,6 +198,21 @@ function runActions(state) {
 }
 
 function simulate(state, action) {
+  switch (action.type) {
+    case "rocket":
+      let dx = (action.vector[2] - action.vector[0]) / 100;
+      let dy = (action.vector[3] - action.vector[1]) / 100;
+      playerShoot(playerName, dx, dy);
+      break;
+    case "spawn":
+      state.players = state.players ? state.players : {};
+      state.players[action.username] = {
+        x: action.position.x,
+        y: action.position.y,
+        name: action.username,
+      };
+      break;
+  }
   console.log("simulate:", action);
 }
 
