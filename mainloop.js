@@ -7,22 +7,11 @@ let playerName = "bobsaget";
 
 let state = null;
 
-// nextActions returns the next action the
-// player wants to execute.
-function nextAction() {
-  return {
-    player: playerName,
-    type: "rocket",
-    vector: [40, 40, 300, 300],
-  }
-}
-
 // start spawns the player and send the spawn action,
 // then, starts the mainloop waiting for its turn.
 function start() {
   GetWorld().then(function(state) {
     // no available world, generate one
-    console.log("world:", state);
 
     if (!state || !state.world) {
       state = newWorld();
@@ -44,7 +33,7 @@ function start() {
     // sends the spawn action to firebase
 
     let action = {
-      username: "bobsaget",
+      username: playerName,
       type: "spawn",
       position: position,
     }
