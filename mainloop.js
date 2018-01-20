@@ -5,6 +5,7 @@ let TurnDelay = 15000;
 
 let firstCall = true;
 let timeout = null;
+let actionsQueue = [];
 
 // start spawns the player and send the spawn action,
 // then, starts the mainloop waiting for its turn.
@@ -33,6 +34,7 @@ function start() {
         position: {
           x: Math.random() % 100,
           y: 600,
+          time: new Date().getTime(),
         }
       }
 
@@ -42,6 +44,15 @@ function start() {
     timeout = setTimeout(function() { send(state) }, 15000);
 
     console.log("created timeout", timeout);
+    SubscribeActions(function(actions) {
+      actionsQueue = actions;
+      for (let i = actions.length-1; i >= 0; i--) {
+        let a = actionsQueue[idx];
+        if (new Date().getTime() - 15000 > a.time) {
+          actionsQueue.splice(idx, 1);
+        }
+      }
+    });
     SubscribNewWorld(function(s) {
       if (!firstCall) {
         interrupt(s);
@@ -59,6 +70,8 @@ function interrupt(state) {
   timeout = clearTimeout(timeout);
 
   simulation(state);
+  console.log("after simulation");
+  console.log(state);
   console.log("interrupt");
 
   timeout = setTimeout(function() { send(state) }, 15000);
@@ -176,15 +189,12 @@ function setWorld(state) {
 // simulation of all players after having retrieved
 // them from firebase.
 function simulation(state) {
-  GetActions().then(function(actions) {
-    // simulate all players action
-    for (idx in actions) {
-      let action = actions[idx];
-      simulate(state, action);
-    }
-  }).catch(function(error) {
-    console.error("simulation:", error);
-  });
+  // simulate all players action
+  for (idx in actionsQueue) {
+    let action = actions[idx];
+    simulate(state, action);
+  }
+  actionsQueue = [];
 }
 
 function simulate(state, action) {
@@ -213,6 +223,7 @@ function simulate(state, action) {
 }
 
 function send(state) {
+  console.log("send");
   // generate some wind
 
   let sign = 1-Math.random()*2;
@@ -241,6 +252,6 @@ function send(state) {
   state.wind = wind;
   state.new_blocks = new_blocks;
 
-  SendWorld(state);
   PurgeActions();
+  SendWorld(state);
 }
