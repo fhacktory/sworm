@@ -13,6 +13,8 @@ function start() {
   GetWorld().then(function(state) {
     let newW = false;
 
+    console.log(firebase.database.ServerValue.TIMESTAMP);
+
     // no available world, generate one
     if (!state || !state.world) {
       state = newWorld();
@@ -34,7 +36,7 @@ function start() {
         position: {
           x: Math.random() % 100,
           y: 600,
-          time: new Date().getTime(),
+          time: firebase.database.ServerValue.TIMESTAMP,
         }
       }
 
@@ -51,7 +53,7 @@ function start() {
       actionsQueue = actions;
       for (let i = actions.length-1; i >= 0; i--) {
         let a = actionsQueue[idx];
-        if (new Date().getTime() - 15000 > a.time) {
+        if (state.time > a.time) {
           actionsQueue.splice(idx, 1);
         }
       }
@@ -254,6 +256,7 @@ function send(state) {
 
   state.wind = wind;
   state.new_blocks = new_blocks;
+  state.time = firebase.database.ServerValue.TIMESTAMP;
 
   //PurgeActions();
   SendWorld(state);
