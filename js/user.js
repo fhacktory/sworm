@@ -25,9 +25,9 @@ function SendVector(canvas, start, stop){
 	var new_action = {
 		type: action,
 		vector: [
-			start.x,
+			600 - start.x,
 			start.y,
-			stop.x,
+			600 - stop.x,
 			stop.y,
 		]
 	}
