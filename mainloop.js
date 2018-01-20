@@ -37,7 +37,9 @@ function start() {
       SendAction(playerName, action)
     }
 
-    timeout = setTimeout(function() { runActions(state) }, 15000);
+    simulation(state);
+
+    timeout = setTimeout(function() { send(state) }, 15000);
     SubscribNewWorld(function(state) {
       interrupt(state);
     });
@@ -49,12 +51,9 @@ function start() {
 
 function interrupt(state) {
   timeout = clearTimeout(timeout);
-  timeout = setTimeout(function() { runActions(state) }, 15000);
+  timeout = setTimeout(function() { simulation(state) }, 15000);
 
-  // display the world
-  setWorld(state);
-  // display the players
-  setPlayers(state);
+  simulation(state);
 }
 
 function setPlayers(state) {
@@ -166,20 +165,17 @@ function setWorld(state) {
   }
 }
 
-// runActions of all players after having retrieved
+// simulation of all players after having retrieved
 // them from firebase.
-function runActions(state) {
+function simulation(state) {
   GetActions().then(function(actions) {
     // simulate all players action
     for (idx in actions) {
       let action = actions[idx];
       simulate(state, action);
     }
-
-    // finalize the state
-    end(state);
   }).catch(function(error) {
-    console.error("runActions:", error);
+    console.error("simulation:", error);
   });
 }
 
@@ -202,7 +198,7 @@ function simulate(state, action) {
   console.log("simulate:", action);
 }
 
-function end(state) {
+function send(state) {
   // generate some wind
 
   let sign = 1-Math.random()*2;
@@ -234,5 +230,5 @@ function end(state) {
   SendWorld(state);
   PurgeActions();
 
-  timeout = setTimeout(function() { runActions(state) }, 15000);
+  timeout = setTimeout(function() { simulation(state) }, 15000);
 }
