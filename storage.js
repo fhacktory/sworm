@@ -44,6 +44,13 @@ function GetActions() {
   });
 }
 
+// PurgeActions supprime toutes les actions
+function PurgeActions() {
+  firebase.database()
+          .ref("actions")
+          .set({});
+}
+
 // Example
 //action = {
 //  "time": (new Date()).getTime(),
