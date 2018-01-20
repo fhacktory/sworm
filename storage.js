@@ -19,6 +19,15 @@ function GetWorld() {
   });
 }
 
+// SubscribNewWorld pour être notifié du changement du monde
+function SubscribNewWorld(cb) {
+  return firebase.database()
+                 .ref("world")
+                 .on('value', function(value){
+    cb(value.val());
+  });
+}
+
 // Set l'état du monde sur Firebase.
 function SendWorld(world) {
   firebase.database()
@@ -50,18 +59,3 @@ function PurgeActions() {
           .ref("actions")
           .set({});
 }
-
-// Example
-//action = {
-//  "time": (new Date()).getTime(),
-//  "foo": 123,
-//  "plop": "bouboup",
-//}
-//SendAction("Remeh", action);
-////
-//GetActions(3).then(function(actions){
-//  console.log(actions);
-//  for(action_id in actions){
-//    console.log(actions[action_id]);
-//  }
-//});
