@@ -25,10 +25,10 @@ function SendVector(canvas, start, stop){
 	var new_action = {
 		type: action,
 		vector: [
-			600 - start.x,
-			start.y,
-			600 - stop.x,
-			stop.y,
+			start.x,
+			600 - start.y,
+			stop.x,
+			600 - stop.y,
 		]
 	}
         SendAction(playerName, new_action);
