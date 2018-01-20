@@ -25,15 +25,16 @@ function start() {
 
     // sends the spawn action to firebase
     // if we're spawning
-    if (!newW) {
+    if (!newW && !state.players[playerName]) {
       let action = {
         username: playerName,
         type: "spawn",
         position: {
-          x: Math.random() % 10,
+          x: Math.random() % 100,
           y: 600,
         }
       }
+
       SendAction(playerName, action)
     }
 
@@ -193,12 +194,20 @@ function simulate(state, action) {
         y: action.position.y,
         name: action.username,
       };
+      let options = {
+        x: action.position.x,
+        y: action.position.y,
+        playerId: action.username,
+      }
+      spawnPlayer(options);
       break;
   }
   console.log("simulate:", action);
 }
 
 function send(state) {
+  console.log("send");
+
   // generate some wind
 
   let sign = 1-Math.random()*2;
