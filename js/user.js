@@ -181,4 +181,4 @@ if(playerName){
 }
 
 // temp
-setUpInteractivityListeners();
+//setUpInteractivityListeners();
