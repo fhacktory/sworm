@@ -13,8 +13,6 @@ function start() {
   GetWorld().then(function(state) {
     let newW = false;
 
-    console.log(firebase.database.ServerValue.TIMESTAMP);
-
     // no available world, generate one
     if (!state || !state.world) {
       state = newWorld();
@@ -47,16 +45,25 @@ function start() {
 
     console.log("created timeout", timeout);
     SubscribeActions(function(actions) {
-      if (!actions) {
-        return;
-      }
-      actionsQueue = actions;
-      for (let i = actions.length-1; i >= 0; i--) {
-        let a = actionsQueue[idx];
-        if (state.time > a.time) {
-          actionsQueue.splice(idx, 1);
+      // we need to get the state to have its time
+      GetWorld().then(function(s) {
+        console.log("fill actionsQueue");
+        if (!actions) {
+          console.log('?');
+          return;
         }
-      }
+        actionsQueue = actions;
+        let keys = Object.keys(actions);
+        for (key in actions) {
+          console.log(key);
+          let a = actions[key];
+          console.log("state", s.time);
+          console.log("a", a.time);
+          if (s.time - 13000 > a.time) {
+            delete actionsQueue[key];
+          }
+        }
+      });
     });
     SubscribeNewWorld(function(s) {
       if (!firstCall) {
@@ -74,12 +81,12 @@ function start() {
 function interrupt(state) {
   timeout = clearTimeout(timeout);
 
-  simulation(state);
+  newState = simulation(state);
   console.log("after simulation");
   console.log(state);
   console.log("interrupt");
 
-  timeout = setTimeout(function() { send(state) }, 15000);
+  timeout = setTimeout(function() { send(newState) }, 15000);
 }
 
 function setPlayers(state) {
@@ -197,9 +204,10 @@ function simulation(state) {
   // simulate all players action
   for (idx in actionsQueue) {
     let action = actionsQueue[idx];
-    simulate(state, action);
+    newState = simulate(state, action);
   }
   actionsQueue = [];
+  return newState;
 }
 
 function simulate(state, action) {
@@ -224,6 +232,8 @@ function simulate(state, action) {
       spawnPlayer(options);
       break;
   }
+
+  return state;
   console.log("simulate:", action);
 }
 
