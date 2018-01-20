@@ -26,7 +26,7 @@ function start() {
 
     // sends the spawn action to firebase
     // if we're spawning
-    if (newW) {
+    if (!newW) {
       let action = {
         username: playerName,
         type: "spawn",
