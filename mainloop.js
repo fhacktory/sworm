@@ -3,8 +3,6 @@ let WorldMaxBlockY = 20;
 let MaxNewBlocks = 5;
 let TurnDelay = 15000;
 
-let playerName = document.cookie;
-
 let state = null;
 
 // start spawns the player and send the spawn action,
