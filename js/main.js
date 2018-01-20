@@ -5,28 +5,43 @@
 */
  
 //Global classnames from Box2d namespace
+
 var b2Vec2 = Box2D.Common.Math.b2Vec2
-    , b2AABB = Box2D.Collision.b2AABB
-    , b2BodyDef = Box2D.Dynamics.b2BodyDef
-    , b2Body = Box2D.Dynamics.b2Body
-    , b2FixtureDef = Box2D.Dynamics.b2FixtureDef
-    , b2Fixture = Box2D.Dynamics.b2Fixture
-    , b2World = Box2D.Dynamics.b2World
-    , b2MassData = Box2D.Collision.Shapes.b2MassData
-    , b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
-    , b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
-    , b2DebugDraw = Box2D.Dynamics.b2DebugDraw
-    , b2Shape = Box2D.Collision.Shapes.b2Shape
-    , b2Joint = Box2D.Dynamics.Joints.b2Joint
-    , b2Settings = Box2D.Common.b2Settings
-    ;
- 
+	, b2AABB = Box2D.Collision.b2AABB
+	, b2BodyDef = Box2D.Dynamics.b2BodyDef
+	, b2Body = Box2D.Dynamics.b2Body
+	, b2FixtureDef = Box2D.Dynamics.b2FixtureDef
+	, b2Fixture = Box2D.Dynamics.b2Fixture
+	, b2World = Box2D.Dynamics.b2World
+	, b2MassData = Box2D.Collision.Shapes.b2MassData
+	, b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
+	, b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
+	, b2DebugDraw = Box2D.Dynamics.b2DebugDraw
+	, b2MouseJointDef =  Box2D.Dynamics.Joints.b2MouseJointDef
+	, b2Shape = Box2D.Collision.Shapes.b2Shape
+	, b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef
+	, b2Joint = Box2D.Dynamics.Joints.b2Joint
+	, b2PrismaticJointDef = Box2D.Dynamics.Joints.b2PrismaticJointDef
+	, b2ContactListener = Box2D.Dynamics.b2ContactListener
+	, b2Settings = Box2D.Common.b2Settings
+	, b2Mat22 = Box2D.Common.Math.b2Mat22
+	, b2EdgeChainDef = Box2D.Collision.Shapes.b2EdgeChainDef
+	, b2EdgeShape = Box2D.Collision.Shapes.b2EdgeShape
+	, b2WorldManifold = Box2D.Collision.b2WorldManifold
+	;
+
 var world;
 var ctx;
 var canvas_width;
 var canvas_height;
 var gameObjects = [];
-var boxWidth = 20;
+var boxWidth = 30;
+
+var images = {};
+
+var prepareImages = function(){
+
+};
 
 var get_offset = function(vector) {
 	return new b2Vec2(vector.x - 0, Math.abs(vector.y - this.canvas_height));
@@ -39,9 +54,8 @@ var scale = 100;
     Draw a world
     this method is called in a loop to redraw the world
 */  
-function draw_world(world, context) 
-{
-	console.log("draw_world");
+var draw_world = function (world, context) {
+	//console.log("draw_world");
     //first clear the canvas
     ctx.clearRect( 0 , 0 , canvas_width, canvas_height );
      
@@ -60,35 +74,30 @@ function draw_world(world, context)
 	}
     ctx.restore();
 	
-}
+};
 
 
 var Box = function(options){
 	this.width = options.width;
 	this.height = options.height;
-	this.body = createBox(options.x / scale, options.y / scale, options.width / scale, options.height / scale, options.options);
-	
-	this.img = new Image();
-	this.img.src = "images/" + options.path + ".png";
-	
+	this.type = options.type;
+	this.path = options.path;
+	this.playerId = options.playerId;
+	this.owner = options.owner;
+	options.options.user_data = this;
+	this.body = createBox(options.x / scale, options.y / scale, options.width / 2 / scale, options.height / 2 / scale, options.options);
 };
 
 Box.prototype.draw = function(){
 	if(this.body == null) {
 		return false;
 	}
-	//draw_body(this.body, this.game.ctx);
-	
 	//var c = get_offset(this.body.GetPosition());
 	var c = this.body.GetPosition();
-	//console.log(c);
-
 	var sx = c.x * scale;
 	var sy = c.y * scale;
-	//console.log(sx, sy);
 	var width = this.width;// / scale;
 	var height = this.height; // / scale;
-	//sy /= scale;
 	ctx.translate(sx, sy);
 	/*
 	console.log("getPosition()", this.body.GetPosition());
@@ -96,26 +105,95 @@ Box.prototype.draw = function(){
 	console.log("height", height);
 	console.log("translate", sx, sy)
 	*/
-	ctx.drawImage(this.img , -width , -height, width * 2, height * 2);
-	//ctx.drawImage(this.img , 100, 100, 100, 100);
+	var cachedImage = images[this.path];
+	if (!cachedImage){
+		cachedImage = new Image();
+		cachedImage.src = "images/" + this.path + ".png";
+		images[this.path] = cachedImage;
+	}
+	var bodyAngle = this.body.GetAngle();
+	ctx.rotate(bodyAngle);
+	ctx.drawImage(cachedImage , -width / 2 , -height / 2, width, height);
+	ctx.rotate(-bodyAngle);
 	ctx.translate(-sx, -sy);
+};
+
+Box.prototype.addVelocity = function(vel)
+{
+	var b = this.body;
+	var v = b.GetLinearVelocity();
+	
+	v.Add(vel);
+	//set the new velocity
+	b.SetLinearVelocity(v);
 };
 
 
 
 var spawnPlayer = function(options){
 	options.path = "player-green";
-	options.width = 20;
-	options.height = 20;
+	options.type = "player";
+	options.width = 24;
+	options.height = 40;
+	options.playerId = options.playerId;
 	options.options = {
 		density: 1
-		
 	};
 	var box = new Box(options);
 	gameObjects.push(box);
 };
 
+var destroyObject = function(o){
+	if(o.body == null) {
+		return;
+	}
+	o.body.GetWorld().DestroyBody( o.body );
+	o.body = null;
+	//o.dead = true;
+};
 
+var setupCollisionHandler = function(){
+	
+	b2ContactListener.prototype.BeginContact = function (contact) {
+		//now come action time
+		var a = contact.GetFixtureA().GetUserData();
+		var b = contact.GetFixtureB().GetUserData();
+		
+		if (a.type == "rocket" && b.type == "player"){
+			console.log("collision", a, b);
+			if (a.owner != b.playerId){
+				destroyObject(a);
+				b.path = "player-dead";
+			}
+			
+		}
+		if (b.type == "rocket" && a.type == "player"){
+			console.log("collision", a, b);
+			if (b.owner != a.playerId){
+				destroyObject(b);
+				a.path = "player-dead";
+			}
+		}
+		/*
+		if(a instanceof player && b instanceof apple)
+		{
+			that.destroy_object(b);
+			that.points++;
+		}
+		
+		else if(b instanceof player && a instanceof apple)
+		{
+			that.destroy_object(a);
+			that.points++;
+		}
+		//apple hits a wall
+		else if(a instanceof apple && b instanceof wall)
+		{
+			that.destroy_object(a);
+		}
+		*/
+	}
+};
 
 
  
@@ -139,17 +217,18 @@ function createWorld()
     
 	// ground
 	var options = {
-		path: 'ground',
+		type: "ground",
+		path: "ground",
 		x: 0 ,
 		y: 10 ,
-		width: (600) ,
-		height: 19 ,
+		width: (600 * 2) ,
+		height: 19 * 2 ,
 		options: {type : b2Body.b2_staticBody}
 	}
-	
 	var box = new Box(options);
-	//box.draw();
 	gameObjects.push(box);
+	
+	setupCollisionHandler();
      
     return world;
 }       
@@ -174,32 +253,6 @@ function createGround(world)
     return world.CreateBody(bodyDef).CreateFixture(fixDef);
 }
  
-//Function to create a ball
-function createBall(world, x, y, r, options) 
-{
-    var body_def = new b2BodyDef();
-    var fix_def = new b2FixtureDef;
-     
-    fix_def.density = 1.0;
-    fix_def.friction = 1;
-    fix_def.restitution = 0.5;
-     
-    var shape = new b2CircleShape(r);
-    fix_def.shape = shape;
-     
-    body_def.position.Set(x , y);
-     
-    body_def.linearDamping = 0.0;
-    body_def.angularDamping = 0.0;
-     
-    body_def.type = b2Body.b2_dynamicBody;
-    body_def.userData = options.user_data;
-     
-    var b = world.CreateBody( body_def );
-    b.CreateFixture(fix_def);
-     
-    return b;
-}
 
 var findMultipleBox = function(x){
 	x = Math.round(x);
@@ -218,6 +271,7 @@ var spawnPlayers = function(){
 		var x = initialPosition * (boxWidth * 2);
 		x += (boxWidth);
 		var options = {
+			playerId: "player" + i,
 			x: x,
 			y: 500
 		};
@@ -243,7 +297,8 @@ var createBoxes = function () {
 		
 		//console.log(x, y);
 		var options = {
-			path: 'wall',
+			type: "wall",
+			path: "wall",
 			x: x,
 			y: y,
 			width: (boxWidth - 1),
@@ -260,8 +315,7 @@ var createBoxes = function () {
 }
  
 //Create standard boxes of given height , width at x,y
-function createBox(x, y, width, height, options) 
-{
+var createBox = function (x, y, width, height, options) {
      //default setting
     options = $.extend(true, {
         'density' : 0.1,
@@ -291,7 +345,8 @@ function createBox(x, y, width, height, options)
     body_def.angularDamping = options.angularDamping;
 
     body_def.type = options.type;
-    body_def.userData = options.user_data;
+	
+    body_def.userData = fix_def.userData = options.user_data;
      
     var b = world.CreateBody( body_def );
     var f = b.CreateFixture(fix_def);
@@ -299,12 +354,8 @@ function createBox(x, y, width, height, options)
     return b;
 }
  
-/*
-    This method will draw the world again and again
-    called by settimeout , self looped
-*/
-function step() 
-{
+
+var step = function () {
     var fps = 60;
     var timeStep = 1.0/fps;
      
@@ -313,18 +364,50 @@ function step()
     world.ClearForces();
      
     draw_world(world, ctx);
-}
+};
  
 /*
     Convert coordinates in canvas to box2d world
 */
-function get_real(p)
-{
+var get_real = function (p){
     return new b2Vec2(p.x + 0, 6 - p.y);
-}
+};
+
+var _playerShoot = function(playerName, vx, vy){
+	
+	var player = _.findWhere(gameObjects, {playerId: playerName});
+	if (!player){
+		console.error("Impossible de trouver le joueur '" + playerName + "'");
+		return;
+	}
+	var playerPosition = player.body.GetPosition();
+	var playerPositionX = (playerPosition.x * scale) + (player.width / 2);
+	var playerPositionY = (playerPosition.y * scale) + (player.height / 2);
+	var options = {
+		owner: player.playerId,
+		type: 'rocket',
+		path: 'rocket',
+		x: playerPositionX,
+		y: playerPositionY,
+		width: 12 ,
+		height: 22, 
+		options: {
+			density: 1,
+			friction: 1,
+			restitution: 0
+		}
+	}
+	
+	var rocket = new Box(options);
+	gameObjects.push(rocket);
+	var vector = new b2Vec2(vx, vy);
+	rocket.addVelocity(vector);
+};
  
 // main entry point
 var init = function(){
+	
+	prepareImages();
     var canvas = $('#canvas');
     ctx = canvas.get(0).getContext('2d');
      
@@ -341,17 +424,19 @@ var init = function(){
 	// create the players
 	spawnPlayers();
     //click event handler on our world
+	/*
     canvas.click( function(e) {
         var p = get_real(new b2Vec2(e.clientX / scale, e.clientY / scale));
-		var x = Math.random() * (canvas_width);
-		x = findMultipleBox(p.x * scale);
-		var options = {
-			x: x,
-			y: 500
-		};
-		spawnPlayer(options);
+			
     });
+	*/
      
      window.setInterval(step, 1000 / 60);
 };
 init();
+
+
+
+
+// points d'entrée
+window.playerShoot = _playerShoot;
