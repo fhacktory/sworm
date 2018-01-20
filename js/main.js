@@ -139,6 +139,7 @@ var spawnPlayer = function(options){
 	};
 	var box = new Box(options);
 	box.body.SetFixedRotation(true);
+	box.body.SetSleepingAllowed(false);
 	gameObjects.push(box);
 };
 
@@ -156,7 +157,6 @@ var destroyObjectFromScene = function(o){
 	}
 	o.body.GetWorld().DestroyBody( o.body );
 	o.body = null;
-	//o.dead = true;
 };
 
 var destroyObject = function(o){
@@ -166,10 +166,10 @@ var destroyObject = function(o){
 var setupCollisionHandler = function(){
 	
 	b2ContactListener.prototype.BeginContact = function (contact) {
-		//now come action time
 		var a = contact.GetFixtureA().GetUserData();
 		var b = contact.GetFixtureB().GetUserData();
 		
+		// rocket tombe sur un mur
 		if (a.type == "rocket" && a.active != false && b.type == "wall"){
 			a.active = false;
 			destroyObject(a);
@@ -180,7 +180,7 @@ var setupCollisionHandler = function(){
 			destroyObject(b);
 			destroyObject(a);
 		}
-		//console.log(a.active, a.type, b.type);
+		// rocket tombe sur un joueur
 		if (a.type == "rocket" && a.active != false && b.type == "player"){
 			if (a.owner != b.playerId){
 				a.active = false;
@@ -188,7 +188,6 @@ var setupCollisionHandler = function(){
 				b.path = "player-dead";
 			}
 		}
-		//console.log(b.active, a.type, b.type);
 		if (b.type == "rocket" && b.active != false && a.type == "player"){
 			if (b.owner != a.playerId){
 				b.active = false;
@@ -196,6 +195,7 @@ var setupCollisionHandler = function(){
 				a.path = "player-dead";
 			}
 		}
+		// rocket tombe sur le sol
 		if (a.type == "rocket" && a.active != false && b.type == "ground"){
 			a.active = false;
 			destroyObject(a);
@@ -203,6 +203,13 @@ var setupCollisionHandler = function(){
 		if (b.type == "rocket" && b.active != false && a.type == "ground"){
 			b.active = false;
 			destroyObject(b);
+		}
+		// joueur retomber sur le sol ou sur un wall
+		if (a.type == "player" && (b.type == "ground" || b.type == "wall")){
+			a.path = "player";
+		}
+		if (b.type == "player" && (a.type == "ground" || a.type == "wall")){
+			b.path = "player";
 		}
 	}
 };
@@ -413,6 +420,7 @@ var _playerJump = function(playerName, vx, vy){
 		return;
 	}
 	var vector = new b2Vec2(vx, vy);
+	player.path = "player-jumping";
 	player.addVelocity(vector);
 };
 
