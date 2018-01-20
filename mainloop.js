@@ -33,10 +33,10 @@ function start() {
       let action = {
         username: playerName,
         type: "spawn",
+        time: firebase.database.ServerValue.TIMESTAMP,
         position: {
           x: Math.random() % 100,
           y: 600,
-          time: firebase.database.ServerValue.TIMESTAMP,
         }
       }
 
