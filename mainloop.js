@@ -41,6 +41,7 @@ function start() {
     simulation(state);
 
     timeout = setTimeout(function() { send(state) }, 15000);
+    console.log("created timeout", timeout);
     SubscribNewWorld(function(state) {
       interrupt(state);
     });
@@ -51,8 +52,9 @@ function start() {
 }
 
 function interrupt(state) {
+  console.log("interrupt");
   timeout = clearTimeout(timeout);
-  timeout = setTimeout(function() { simulation(state) }, 15000);
+  timeout = setTimeout(function() { send(state) }, 15000);
 
   simulation(state);
 }
@@ -238,6 +240,4 @@ function send(state) {
 
   SendWorld(state);
   PurgeActions();
-
-  timeout = setTimeout(function() { simulation(state) }, 15000);
 }
