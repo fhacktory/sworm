@@ -1,5 +1,5 @@
-let WorldMaxBlockX = 50;
-let WorldMaxBlockY = 50;
+let WorldMaxBlockX = 15;
+let WorldMaxBlockY = 15;
 let MaxNewBlocks = 5;
 let TurnDelay = 15000;
 
@@ -29,6 +29,10 @@ function start() {
       SendWorld(state);
     }
 
+    setWorld(state);
+
+    spawnPlayers();
+
     // puts the player somewhere in the world
 
     let position = findPosition(state);
@@ -38,7 +42,7 @@ function start() {
     }
 
     // sends the spawn action to firebase
-    
+
     let action = {
       username: "bobsaget",
       type: "spawn",
@@ -51,7 +55,7 @@ function start() {
 
     run();
   }).catch(function(error) {
-    // TODO(remy): error handling 
+    // TODO(remy): error handling
     console.error("start:", error);
   });
 }
@@ -109,7 +113,7 @@ function getBlock(state, x, y) {
       return b;
     }
   }
-  
+
   // block not found, identify it as the sky
   return {
     type: "sky",
@@ -140,6 +144,32 @@ function run() {
   }).catch(function(error) {
     console.log("run:", error);
   });
+}
+
+function setWorld(state) {
+  for (let idx in state.world) {
+    let b = state.world[idx];
+
+		var x = (b.x * boxWidth * 2) + (boxWidth);
+		var y = 60 + (boxWidth) + (b.y * boxWidth * 2);
+    console.log(b.x);
+
+		var options = {
+			path: 'wall',
+			x: x,
+			y: y,
+			width: boxWidth,
+			height: boxWidth,
+			options: {
+				density: 100,
+				friction: 1,
+				restitution: 0,
+			}
+		};
+
+		var box = new Box(options);
+		gameObjects.push(box);
+  }
 }
 
 // runActions of all players after having retrieved

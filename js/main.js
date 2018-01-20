@@ -335,21 +335,16 @@ var init = function(){
     canvas_width = parseInt(canvas.attr('width'));
     canvas_height = parseInt(canvas.attr('height'));
      
-    //create the level
-    createBoxes();
-    
-	// create the players
-	spawnPlayers();
     //click event handler on our world
     canvas.click( function(e) {
         var p = get_real(new b2Vec2(e.clientX / scale, e.clientY / scale));
-		var x = Math.random() * (canvas_width);
-		x = findMultipleBox(p.x * scale);
-		var options = {
-			x: x,
-			y: 500
-		};
-		spawnPlayer(options);
+      var x = Math.random() * (canvas_width);
+      x = findMultipleBox(p.x * scale);
+      var options = {
+        x: x,
+        y: 500
+      };
+      spawnPlayer(options);
     });
      
      window.setInterval(step, 1000 / 60);
