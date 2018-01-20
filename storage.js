@@ -53,6 +53,15 @@ function GetActions() {
   });
 }
 
+// SubscribActions pour être notifié du changement du monde
+function SubscribActions(cb) {
+  return firebase.database()
+                 .ref("actions")
+                 .on('value', function(value){
+    cb(value.val());
+  });
+}
+
 // PurgeActions supprime toutes les actions
 function PurgeActions() {
   firebase.database()
