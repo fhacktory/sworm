@@ -32,7 +32,6 @@ Action
 --
 
 {
-    "player": username,
     "type: "rocket", // none, rocket, move
     "vector": [], // x0, y0, x1, y1
 }

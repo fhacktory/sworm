@@ -20,15 +20,24 @@ function DrawVector(canvas, start, stop){
 	context.stroke();
 }
 
-function SendAction(canvas, start, stop){
+function SendVector(canvas, start, stop){
 	clearCanvas(canvas);
-	console.log(action, start, stop); //TODO Do the real action
+	var new_action = {
+		type: action,
+		vector: [
+			start.x,
+			start.y,
+			stop.x,
+			stop.y,
+		]
+	}
+        SendAction(playerName, new_action);
 }
 
 var canvas = document.getElementById('inputCanvas');
 var context = canvas.getContext('2d');
 var mouseDownPos = null;
-var action = "shoot";
+var action = "rocket";
 
 canvas.addEventListener('mousedown', function(evt) {
 	mouseDownPos = getMousePos(canvas, evt);
@@ -42,19 +51,19 @@ canvas.addEventListener('mousemove', function(evt) {
 }, false);
 
 canvas.addEventListener('mouseup', function(evt) {
-	SendAction(canvas, mouseDownPos, getMousePos(canvas, evt));
+	SendVector(canvas, mouseDownPos, getMousePos(canvas, evt));
 	mouseDownPos = null;
 }, false);
 
 canvas.addEventListener('keydown', function (e) {
 	if (e.key == "Control"){
-		action = "jump";
+		action = "move";
 	}
 }, false);
 
 canvas.addEventListener('keyup', function (e) {
 	if (e.key == "Control"){
-		action = "shoot";
+		action = "rocket";
 	}
 }, false);
 
