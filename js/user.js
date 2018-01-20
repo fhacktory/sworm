@@ -1,3 +1,5 @@
+////////////////////////////////////////
+// COOKIES
 function createCookie(name, value, days) {
     var expires;
 
@@ -30,35 +32,77 @@ function eraseCookie(name) {
 
 const COOKIE_NAME = "swormPlayerName";
 
+// COOKIES
+////////////////////////////////////////
+
+
+var inputCanvas = document.getElementById('inputCanvas');
+var context = inputCanvas.getContext('2d');
+var mouseDownPos = null;
+var action = "rocket";
+
+var joinButton = document.getElementById('joinButton');
+var playerNameInput = document.getElementById('playerName');
+
 let playerName = readCookie(COOKIE_NAME);
 
-function clearCanvas(canvas, message) {
-	var context = canvas.getContext('2d');
-	context.clearRect(0, 0, canvas.width, canvas.height);
+function clearCanvas(inputCanvas, message) {
+	var ctx = inputCanvas.getContext('2d');
+	ctx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
 }
 
-function getMousePos(canvas, evt) {
-	var rect = canvas.getBoundingClientRect();
+function getMousePos(inputCanvas, evt) {
+	var rect = inputCanvas.getBoundingClientRect();
 	return {
 		x: evt.clientX - rect.left,
 		y: evt.clientY - rect.top
 	};
 }
 
-function DrawVector(canvas, start, stop){
-	var context=canvas.getContext("2d");
-	context.clearRect(0, 0, 600, 600);
-	context.beginPath();
-	context.moveTo(start.x, start.y);
-	context.lineTo(stop.x, stop.y);
-	context.stroke();
+function DrawVector(inputCanvas, start, stop){
+	var ctx = inputCanvas.getContext("2d");
+	ctx.clearRect(0, 0, 600, 600);
+	ctx.beginPath();
+	// offset perpendiculaire
+	var dx = start.x - stop.x;
+	var dy = start.y - stop.y;
+	var dist = Math.sqrt(dx*dx + dy*dy);
+	var dx = dx / dist;
+	var dy = dy / dist;
+	var N = dist / 10;
+	var x3 = stop.x + (N/2)*dy;
+	var y3 = stop.y - (N/2)*dx;
+	var x4 = stop.x - (N/2)*dy;
+	var y4 = stop.y + (N/2)*dx;
+	ctx.moveTo(start.x, start.y);
+	ctx.lineTo(x3, y3);
+	ctx.lineTo(x4, y4);
+	ctx.closePath();
+	var gradient = ctx.createLinearGradient(start.x, start.y, 150, 100);
+	if (action == "rocket"){
+		gradient.addColorStop(0, "#FFFF00");
+		gradient.addColorStop(0.5, "#FF9900");
+		gradient.addColorStop(1, "#FF0000");	
+	} else {
+		gradient.addColorStop(0, "#66FFFF");
+		gradient.addColorStop(0.5, "#6666FF");
+		gradient.addColorStop(1, "#6600FF");	
+	}
+	
+	ctx.fillStyle = gradient;
+	ctx.fill();
+	ctx.strokeStyle="#bbb";
+	ctx.stroke();
 }
 
-function SendVector(canvas, start, stop){
-	clearCanvas(canvas);
+function SendVector(inputCanvas, start, stop){
+	clearCanvas(inputCanvas);
+	if (!playerName){
+		return;
+	}
 	var new_action = {
 		type: action,
-    time: new Date().getTime(),
+		time: new Date().getTime(),
 		vector: [
 			start.x,
 			600 - start.y,
@@ -66,7 +110,7 @@ function SendVector(canvas, start, stop){
 			600 - stop.y,
 		]
 	}
-        SendAction(playerName, new_action);
+	SendAction(playerName, new_action);
 }
 
 function DisplayScores(playerList){
@@ -78,46 +122,7 @@ function DisplayScores(playerList){
 	$('#scoresBody').html(data);
 }
 
-var canvas = document.getElementById('inputCanvas');
-var context = canvas.getContext('2d');
-var mouseDownPos = null;
-var action = "rocket";
 
-canvas.addEventListener('mousedown', function(evt) {
-	mouseDownPos = getMousePos(canvas, evt);
-}, false);
-
-canvas.addEventListener('mousemove', function(evt) {
-	if(mouseDownPos == null){
-		return;
-	}
-	DrawVector(canvas, mouseDownPos, getMousePos(canvas, evt));
-}, false);
-
-canvas.addEventListener('mouseup', function(evt) {
-	SendVector(canvas, mouseDownPos, getMousePos(canvas, evt));
-	mouseDownPos = null;
-}, false);
-
-canvas.addEventListener('keydown', function (e) {
-	if (e.key == "Control"){
-		action = "move";
-	}
-}, false);
-
-canvas.addEventListener('keyup', function (e) {
-	if (e.key == "Control"){
-		action = "rocket";
-	}
-}, false);
-
-canvas.setAttribute('tabindex','0');
-canvas.focus();
-
-
-
-var joinButton = document.getElementById('joinButton');
-var playerNameInput = document.getElementById('playerName');
 joinButton.addEventListener("click", function(e){
 	if(playerNameInput.value == ''){
 		return;
@@ -128,13 +133,52 @@ joinButton.addEventListener("click", function(e){
 	join();
 });
 
-function join(){
+var setUpInteractivityListeners = function(){
+		
+	inputCanvas.addEventListener('mousedown', function(evt) {
+		mouseDownPos = getMousePos(inputCanvas, evt);
+	}, false);
+
+	inputCanvas.addEventListener('mousemove', function(evt) {
+		if(mouseDownPos == null){
+			return;
+		}
+		DrawVector(inputCanvas, mouseDownPos, getMousePos(inputCanvas, evt));
+	}, false);
+
+	inputCanvas.addEventListener('mouseup', function(evt) {
+		SendVector(inputCanvas, mouseDownPos, getMousePos(inputCanvas, evt));
+		mouseDownPos = null;
+	}, false);
+
+	inputCanvas.addEventListener('keydown', function (e) {
+		if (e.key == "Control"){
+			action = "move";
+		}
+	}, false);
+
+	inputCanvas.addEventListener('keyup', function (e) {
+		if (e.key == "Control"){
+			action = "rocket";
+		}
+	}, false);
+
+	inputCanvas.setAttribute('tabindex','0');
+	inputCanvas.focus();
+
+};
+
+var join = function (){
 	playerNameInput.value = playerName
 	playerNameInput.disabled = true;
 	joinButton.disabled = true;
+	setUpInteractivityListeners();
 	start();
 }
 
 if(playerName){
 	join();
 }
+
+// temp
+setUpInteractivityListeners();
