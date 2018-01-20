@@ -34,6 +34,14 @@ function SendVector(canvas, start, stop){
         SendAction(playerName, new_action);
 }
 
+function DisplayScores(playerList){
+	var data = "";
+	for(index in playerList){
+		data += "<tr><td>" + playerList[index].username + "</td><td>" + playerList[index].frag + "</td><td>" + playerList[index].death + "</td></tr>";
+	}
+	$('#scoresBody').html(data);
+}
+
 var canvas = document.getElementById('inputCanvas');
 var context = canvas.getContext('2d');
 var mouseDownPos = null;
