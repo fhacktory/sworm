@@ -58,6 +58,7 @@ function SendVector(canvas, start, stop){
 	clearCanvas(canvas);
 	var new_action = {
 		type: action,
+    time: new Date().getTime(),
 		vector: [
 			start.x,
 			600 - start.y,

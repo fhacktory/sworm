@@ -19,8 +19,8 @@ function GetWorld() {
   });
 }
 
-// SubscribNewWorld pour être notifié du changement du monde
-function SubscribNewWorld(cb) {
+// SubscribeNewWorld pour être notifié du changement du monde
+function SubscribeNewWorld(cb) {
   return firebase.database()
                  .ref("world")
                  .on('value', function(value){
@@ -50,6 +50,15 @@ function GetActions() {
                  .once('value')
                  .then(function(snaptshot) {
     return snaptshot.val();
+  });
+}
+
+// SubscribeActions pour être notifié du changement du monde
+function SubscribeActions(cb) {
+  return firebase.database()
+                 .ref("actions")
+                 .on('value', function(value){
+    cb(value.val());
   });
 }
 
