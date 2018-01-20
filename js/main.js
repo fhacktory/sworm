@@ -1,11 +1,3 @@
-/**
-    Box2d basics, uses debugdraw
-    Silver Moon
-    m00n.silv3r@gmail.com
-*/
- 
-//Global classnames from Box2d namespace
-
 var b2Vec2 = Box2D.Common.Math.b2Vec2
 	, b2AABB = Box2D.Collision.b2AABB
 	, b2BodyDef = Box2D.Dynamics.b2BodyDef
@@ -39,6 +31,10 @@ var to_destroy = [];
 var boxWidth = 30;
 
 var images = {};
+
+Math.degrees = function(radians) {
+  return radians * 180 / Math.PI;
+};
 
 var get_offset = function(vector) {
 	return new b2Vec2(vector.x - 0, Math.abs(vector.y - this.canvas_height));
@@ -96,18 +92,17 @@ Box.prototype.draw = function(){
 		return false;
 	}
 	//var c = get_offset(this.body.GetPosition());
+	if (this.type == "rocket"){
+		var velocity = this.body.GetLinearVelocity();
+		var rotation = Math.atan2(-velocity.x, velocity.y);
+		this.body.SetAngle(rotation);
+	}
 	var c = this.body.GetPosition();
 	var sx = c.x * scale;
 	var sy = c.y * scale;
 	var width = this.width;// / scale;
 	var height = this.height; // / scale;
 	ctx.translate(sx, sy);
-	/*
-	console.log("getPosition()", this.body.GetPosition());
-	console.log("width", width);
-	console.log("height", height);
-	console.log("translate", sx, sy)
-	*/
 	var cachedImage = images[this.path];
 	if (!cachedImage){
 		cachedImage = new Image();
@@ -119,6 +114,7 @@ Box.prototype.draw = function(){
 	ctx.drawImage(cachedImage , -width / 2 , -height / 2, width, height);
 	ctx.rotate(-bodyAngle);
 	ctx.translate(-sx, -sy);
+	
 };
 
 Box.prototype.addVelocity = function(vel)
@@ -453,13 +449,6 @@ var init = function(){
     //get internal dimensions of the canvas
     canvas_width = parseInt(canvas.attr('width'));
     canvas_height = parseInt(canvas.attr('height'));
-     
-    //click event handler on our world
-	/*
-    canvas.click( function(e) {
-        var p = get_real(new b2Vec2(e.clientX / scale, e.clientY / scale));
-    });
-	*/
      
      window.setInterval(step, 1000 / 60);
 };
