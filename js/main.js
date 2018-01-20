@@ -120,8 +120,33 @@ Box.prototype.draw = function(){
 	ctx.rotate(bodyAngle);
 	ctx.drawImage(cachedImage , -width / 2 , -height / 2, width, height);
 	ctx.rotate(-bodyAngle);
+	if (this.type == "player"){
+		var textSize = this.playerId.length * 5;
+		var textTranslateX = -textSize;
+		var textTranslateY = height + 12;
+		ctx.translate(textTranslateX, textTranslateY);
+		//ctx.rotate(Math.PI / 2);
+		ctx.scale(1, -1);
+		var textPositionX = sx - (width / 2) - 10;
+		var textPositionY = sy - (height / 2) - 10;
+		ctx.font = '14pt sans-serif';
+		ctx.textBaseline = "top";
+		ctx.lineJoin = "round";
+		ctx.strokeStyle = "#111";
+		ctx.lineWidth = 5;
+
+		ctx.strokeText(this.playerId, 10, 10);                 // stroke
+		ctx.globalCompositeOperation = "destination-out";  // will delete what's under
+		ctx.fillText(this.playerId, 10, 10);                   //   on next draw
+		ctx.globalCompositeOperation = "source-over";      // normal comp. mode
+		ctx.fillStyle = "#3366FF";                 // draw in target fill/color
+		ctx.fillText(this.playerId, 10, 10);
+		//ctx.rotate(-Math.PI / 2);
+		ctx.scale(1, -1);
+		ctx.translate(-textTranslateX, -textTranslateY);
+	}
 	ctx.translate(-sx, -sy);
-	
+
 };
 
 Box.prototype.addVelocity = function(vel) {
@@ -477,6 +502,10 @@ var init = function(){
      window.setInterval(step, 1000 / 60);
 };
 init();
+
+// temp
+createBoxes();
+spawnPlayers();
 
 // points d'entrée
 window.playerShoot = _playerShoot;
