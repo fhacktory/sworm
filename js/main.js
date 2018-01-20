@@ -413,6 +413,3 @@ init();
 // points d'entrée
 window.playerShoot = _playerShoot;
 window.addBox = _addBox;
-
-start();
-
