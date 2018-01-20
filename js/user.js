@@ -86,8 +86,19 @@ joinButton.addEventListener("click", function(e){
 	if(playerNameInput.value == ''){
 		return;
 	}
+
 	playerName = playerNameInput.value;
+	document.cookie = playerName;
+	join();
+});
+
+function join(){
+	playerNameInput.value = playerName
 	playerNameInput.disabled = true;
 	joinButton.disabled = true;
 	start();
-});
+}
+
+if(playerName){
+	join()
+}

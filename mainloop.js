@@ -3,7 +3,7 @@ let WorldMaxBlockY = 20;
 let MaxNewBlocks = 5;
 let TurnDelay = 15000;
 
-let playerName = "bobsaget";
+let playerName = document.cookie;
 
 let state = null;
 
