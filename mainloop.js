@@ -3,6 +3,7 @@ let WorldMaxBlockY = 20;
 let MaxNewBlocks = 5;
 let TurnDelay = 15000;
 
+let firstCall = true;
 let timeout = null;
 
 // start spawns the player and send the spawn action,
@@ -38,12 +39,15 @@ function start() {
       SendAction(playerName, action)
     }
 
-    simulation(state);
-
     timeout = setTimeout(function() { send(state) }, 15000);
+
     console.log("created timeout", timeout);
-    SubscribNewWorld(function(state) {
-      interrupt(state);
+    SubscribNewWorld(function(s) {
+      if (!firstCall) {
+        interrupt(s);
+      } else {
+        firstCall = false;
+      }
     });
   }).catch(function(error) {
     // TODO(remy): error handling
@@ -52,11 +56,12 @@ function start() {
 }
 
 function interrupt(state) {
-  console.log("interrupt");
   timeout = clearTimeout(timeout);
-  timeout = setTimeout(function() { send(state) }, 15000);
 
   simulation(state);
+  console.log("interrupt");
+
+  timeout = setTimeout(function() { send(state) }, 15000);
 }
 
 function setPlayers(state) {
@@ -208,8 +213,6 @@ function simulate(state, action) {
 }
 
 function send(state) {
-  console.log("send");
-
   // generate some wind
 
   let sign = 1-Math.random()*2;
