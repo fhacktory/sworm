@@ -117,11 +117,9 @@ Box.prototype.draw = function(){
 	
 };
 
-Box.prototype.addVelocity = function(vel)
-{
+Box.prototype.addVelocity = function(vel) {
 	var b = this.body;
 	var v = b.GetLinearVelocity();
-	
 	v.Add(vel);
 	//set the new velocity
 	b.SetLinearVelocity(v);
@@ -130,15 +128,17 @@ Box.prototype.addVelocity = function(vel)
 
 
 var spawnPlayer = function(options){
-	options.path = "player-green";
+	console.log("spawning player ...", options);
+	options.path = "player";
 	options.type = "player";
-	options.width = 24;
-	options.height = 40;
+	options.width = 31;
+	options.height = 38;
 	options.playerId = options.playerId;
 	options.options = {
 		density: 1
 	};
 	var box = new Box(options);
+	box.body.SetFixedRotation(true);
 	gameObjects.push(box);
 };
 
@@ -406,11 +406,20 @@ var get_real = function (p){
     return new b2Vec2(p.x + 0, 6 - p.y);
 };
 
-var _playerShoot = function(playerName, vx, vy){
-	
+var _playerJump = function(playerName, vx, vy){
 	var player = _.findWhere(gameObjects, {playerId: playerName});
 	if (!player){
-		console.error("Impossible de trouver le joueur '" + playerName + "'");
+		console.error("_playerJump::Impossible de trouver le joueur '" + playerName + "'");
+		return;
+	}
+	var vector = new b2Vec2(vx, vy);
+	player.addVelocity(vector);
+};
+
+var _playerShoot = function(playerName, vx, vy){
+	var player = _.findWhere(gameObjects, {playerId: playerName});
+	if (!player){
+		console.error("_playerShoot::Impossible de trouver le joueur '" + playerName + "'");
 		return;
 	}
 	var playerPosition = player.body.GetPosition();
@@ -456,5 +465,6 @@ init();
 
 // points d'entrée
 window.playerShoot = _playerShoot;
+window.playerJump = _playerJump;
 window.addBox = _addBox;
 window.removeBox = _removeBox;
