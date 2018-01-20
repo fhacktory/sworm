@@ -150,25 +150,9 @@ function run() {
 function setWorld(state) {
   for (let idx in state.world) {
     let b = state.world[idx];
-
-		var x = (b.x * boxWidth) + (boxWidth/2);
-		var y = 60 + (boxWidth/2) + (b.y * boxWidth);
-
-		var options = {
-			path: 'wall',
-			x: x,
-			y: y,
-			width: boxWidth,
-			height: boxWidth,
-			options: {
-				density: 100,
-				friction: 1,
-				restitution: 0,
-			}
-		};
-
-		var box = new Box(options);
-		gameObjects.push(box);
+	var x = (b.x * boxWidth) + (boxWidth/2);
+	var y = (28) + (boxWidth/2) + (b.y * boxWidth);
+	window.addBox(x, y);
   }
 }
 

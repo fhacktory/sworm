@@ -174,24 +174,6 @@ var setupCollisionHandler = function(){
 				a.path = "player-dead";
 			}
 		}
-		/*
-		if(a instanceof player && b instanceof apple)
-		{
-			that.destroy_object(b);
-			that.points++;
-		}
-		
-		else if(b instanceof player && a instanceof apple)
-		{
-			that.destroy_object(a);
-			that.points++;
-		}
-		//apple hits a wall
-		else if(a instanceof apple && b instanceof wall)
-		{
-			that.destroy_object(a);
-		}
-		*/
 	}
 };
 
@@ -232,26 +214,6 @@ function createWorld()
      
     return world;
 }       
- 
-function createGround(world) 
-{
-    var bodyDef = new b2BodyDef();
-     
-    var fixDef = new b2FixtureDef();
-    fixDef.density = 1.0;
-    fixDef.friction = 1.0;
-    fixDef.restitution = 0.5;
-     
-    fixDef.shape = new b2PolygonShape;
-     
-    //mention half the sizes
-    fixDef.shape.SetAsBox(4.00 , .5);
-     
-    //set the position of the center
-    bodyDef.position.Set(4.10 , 1);
-     
-    return world.CreateBody(bodyDef).CreateFixture(fixDef);
-}
  
 
 var findMultipleBox = function(x){
@@ -313,6 +275,25 @@ var createBoxes = function () {
 		gameObjects.push(box);
 	}
 }
+
+var _addBox = function(x, y){
+	var options = {
+		path: 'wall',
+		x: x,
+		y: y,
+		width: boxWidth,
+		height: boxWidth,
+		options: {
+			type : b2Body.b2_staticBody,
+			density: 100,
+			friction: 1,
+			restitution: 0,
+		}
+	};
+
+	var box = new Box(options);
+	gameObjects.push(box);
+};
  
 //Create standard boxes of given height , width at x,y
 var createBox = function (x, y, width, height, options) {
@@ -431,5 +412,7 @@ init();
 
 // points d'entrée
 window.playerShoot = _playerShoot;
+window.addBox = _addBox;
 
 start();
+
