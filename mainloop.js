@@ -194,7 +194,7 @@ function setWorld(state) {
 function simulation(state) {
   // simulate all players action
   for (idx in actionsQueue) {
-    let action = actions[idx];
+    let action = actionsQueue[idx];
     simulate(state, action);
   }
   actionsQueue = [];
@@ -255,6 +255,6 @@ function send(state) {
   state.wind = wind;
   state.new_blocks = new_blocks;
 
-  PurgeActions();
+  //PurgeActions();
   SendWorld(state);
 }
