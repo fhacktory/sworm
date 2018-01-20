@@ -23,7 +23,6 @@ function start() {
     // display the players
     setPlayers(state);
 
-
     // sends the spawn action to firebase
     // if we're spawning
     if (!newW) {
@@ -39,13 +38,16 @@ function start() {
     }
 
     timeout = setTimeout(function() { runActions(state) }, 15000);
+    SubscribNewWorld(function(state) {
+      interrupt(state);
+    });
   }).catch(function(error) {
     // TODO(remy): error handling
     console.error("start:", error);
   });
 }
 
-function subscribe(state) {
+function interrupt(state) {
   timeout = clearTimeout(timeout);
   timeout = setTimeout(function() { runActions(state) }, 15000);
 
@@ -228,6 +230,7 @@ function end(state) {
 
   state.wind = wind;
   state.new_blocks = new_blocks;
+
   SendWorld(state);
   PurgeActions();
 
