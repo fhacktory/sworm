@@ -504,8 +504,8 @@ var init = function(){
 init();
 
 // temp
-createBoxes();
-spawnPlayers();
+//createBoxes();
+//spawnPlayers();
 
 // points d'entrée
 window.playerShoot = _playerShoot;
