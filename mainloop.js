@@ -3,48 +3,56 @@ let WorldMaxBlockY = 20;
 let MaxNewBlocks = 5;
 let TurnDelay = 15000;
 
-let state = null;
+let timeout = null;
 
 // start spawns the player and send the spawn action,
 // then, starts the mainloop waiting for its turn.
 function start() {
   GetWorld().then(function(state) {
-    // no available world, generate one
+    let newW = false;
 
+    // no available world, generate one
     if (!state || !state.world) {
       state = newWorld();
       SendWorld(state);
+      newW = true;
     }
 
+    // display the world
     setWorld(state);
-
+    // display the players
     setPlayers(state);
 
-    // puts the player somewhere in the world
-
-    let position = findPosition(state);
-    if (position.x === -1) {
-      console.error("can't spawn the player");
-      return;
-    }
 
     // sends the spawn action to firebase
-
-    let action = {
-      username: playerName,
-      type: "spawn",
-      position: position,
+    // if we're spawning
+    if (newW) {
+      let action = {
+        username: playerName,
+        type: "spawn",
+        position: {
+          x: Math.random() % 10,
+          y: 600,
+        }
+      }
+      SendAction(playerName, action)
     }
 
-    SendAction(playerName, action) // TODO(remy): error handling
-
-    // starts the main loop
-
-    run();
+    timeout = setTimeout(function() { runActions(state) }, 15000);
   }).catch(function(error) {
     // TODO(remy): error handling
     console.error("start:", error);
   });
+}
+
+function subscribe(state) {
+  timeout = clearTimeout(timeout);
+  timeout = setTimeout(function() { runActions(state) }, 15000);
+
+  // display the world
+  setWorld(state);
+  // display the players
+  setPlayers(state);
 }
 
 function setPlayers(state) {
@@ -73,11 +81,16 @@ function newWorld() {
     });
   }
 
+  let players = {};
+  players[playerName] = {
+    name: playerName,
+    x: 1,
+    y: 0,
+  }
+
   return {
-    next_turn: new Date().getTime()+15000,
     wind: 0,
-    players: [],
-    // NOTE(remy): could be new block
+    players: players,
     world: bs,
   }
 }
@@ -125,33 +138,6 @@ function getBlock(state, x, y) {
   }
 }
 
-function run() {
-  let st = null;
-
-  GetWorld().then(function (state) {
-    if (!state.next_turn) {
-      console.error("run: no next turn");
-      return;
-    }
-
-    // redraw the world
-    updateWorld(state);
-
-    // wait for the end of the turn and execute
-    let wait = state.next_turn - new Date().getTime();
-    if (wait < 0) {
-      wait = 0;
-    }
-    console.log("will wait", wait);
-    setTimeout(function() {
-      runActions(state)
-    }, wait);
-
-  }).catch(function(error) {
-    console.log("run:", error);
-  });
-}
-
 function updateWorld(state) {
   for (let idx in state.world) {
     let b = state.world[idx];
@@ -197,11 +183,11 @@ function runActions(state) {
 
 function simulate(state, action) {
   switch (action.type) {
-    case "rocket":
-      let dx = (action.vector[2] - action.vector[0]) / 100;
-      let dy = (action.vector[3] - action.vector[1]) / 100;
-      playerShoot(playerName, dx, dy);
-      break;
+    //case "rocket":
+    //  let dx = (action.vector[2] - action.vector[0]) / 100;
+    //  let dy = (action.vector[3] - action.vector[1]) / 100;
+    //  playerShoot(playerName, dx, dy);
+    //  break;
     case "spawn":
       state.players = state.players ? state.players : {};
       state.players[action.username] = {
@@ -240,10 +226,10 @@ function end(state) {
   // wind and new_blocks contains the information the new world.
   // send them to firebase
 
-  state.next_turn = new Date().getTime()+TurnDelay;
   state.wind = wind;
   state.new_blocks = new_blocks;
-  SendWorld(state); // TODO(remy): error handling
+  SendWorld(state);
+  PurgeActions();
 
-  run();
+  timeout = setTimeout(function() { runActions(state) }, 15000);
 }
