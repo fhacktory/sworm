@@ -45,6 +45,9 @@ function start() {
 
     console.log("created timeout", timeout);
     SubscribeActions(function(actions) {
+      if (!actions) {
+        return;
+      }
       actionsQueue = actions;
       for (let i = actions.length-1; i >= 0; i--) {
         let a = actionsQueue[idx];
@@ -53,7 +56,7 @@ function start() {
         }
       }
     });
-    SubscribNewWorld(function(s) {
+    SubscribeNewWorld(function(s) {
       if (!firstCall) {
         interrupt(s);
       } else {
