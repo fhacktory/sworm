@@ -69,3 +69,17 @@ canvas.addEventListener('keyup', function (e) {
 
 canvas.setAttribute('tabindex','0');
 canvas.focus();
+
+
+
+var joinButton = document.getElementById('joinButton');
+var playerNameInput = document.getElementById('playerName');
+joinButton.addEventListener("click", function(e){
+	if(playerNameInput.value == ''){
+		return;
+	}
+	playerName = playerNameInput.value;
+	playerNameInput.disabled = true;
+	joinButton.disabled = true;
+	start();
+});

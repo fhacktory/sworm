@@ -469,6 +469,3 @@ init();
 window.playerShoot = _playerShoot;
 window.addBox = _addBox;
 window.removeBox = _removeBox;
-
-start();
-
