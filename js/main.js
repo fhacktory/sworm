@@ -40,8 +40,17 @@ var get_offset = function(vector) {
 	return new b2Vec2(vector.x - 0, Math.abs(vector.y - this.canvas_height));
 }
 
+var getCachedImage = function(path){
+	var cachedImage = images[path];
+	if (!cachedImage){
+		cachedImage = new Image();
+		cachedImage.src = "images/" + path + ".png";
+		images[path] = cachedImage;
+	}
+	return cachedImage;
+};
+
 var performDestroy = function() {
-	
 	for (var i = 0, l = to_destroy.length; i<l; i++){
 		var o = to_destroy[i];
 		console.log("destroying ...", o);
@@ -60,6 +69,9 @@ var draw_world = function (world, context) {
      
     ctx.fillStyle = '#333';
     ctx.fillRect(0,0, canvas_width, canvas_height);
+	
+	var background = getCachedImage("background");
+	ctx.drawImage(background, 0 , 0 , canvas_width, canvas_height);
          
     //convert the canvas coordinate directions to cartesian
     ctx.save();
@@ -103,12 +115,7 @@ Box.prototype.draw = function(){
 	var width = this.width;// / scale;
 	var height = this.height; // / scale;
 	ctx.translate(sx, sy);
-	var cachedImage = images[this.path];
-	if (!cachedImage){
-		cachedImage = new Image();
-		cachedImage.src = "images/" + this.path + ".png";
-		images[this.path] = cachedImage;
-	}
+	var cachedImage = getCachedImage(this.path);
 	var bodyAngle = this.body.GetAngle();
 	ctx.rotate(bodyAngle);
 	ctx.drawImage(cachedImage , -width / 2 , -height / 2, width, height);

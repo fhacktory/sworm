@@ -69,6 +69,7 @@ function SendVector(canvas, start, stop){
 }
 
 function DisplayScores(playerList){
+	$('#scores').show();
 	var data = "";
 	for(index in playerList){
 		data += "<tr><td>" + playerList[index].username + "</td><td>" + playerList[index].frag + "</td><td>" + playerList[index].death + "</td></tr>";
