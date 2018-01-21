@@ -39,6 +39,7 @@ const COOKIE_NAME = "swormPlayerName";
 var inputCanvas = document.getElementById('inputCanvas');
 var context = inputCanvas.getContext('2d');
 var mouseDownPos = null;
+var currentMousePos = null;
 var action = "rocket";
 
 var joinButton = document.getElementById('joinButton');
@@ -148,23 +149,31 @@ var setUpInteractivityListeners = function(){
 		if(mouseDownPos == null){
 			return;
 		}
-		DrawVector(inputCanvas, mouseDownPos, getMousePos(inputCanvas, evt));
+		currentMousePos = getMousePos(inputCanvas, evt);
+		DrawVector(inputCanvas, mouseDownPos, currentMousePos);
 	}, false);
 
 	inputCanvas.addEventListener('mouseup', function(evt) {
 		SendVector(inputCanvas, mouseDownPos, getMousePos(inputCanvas, evt));
 		mouseDownPos = null;
+		currentMousePos = null;
 	}, false);
 
 	inputCanvas.addEventListener('keydown', function (e) {
 		if (e.key == "Control"){
 			action = "move";
+			if(mouseDownPos && currentMousePos){
+				DrawVector(inputCanvas, mouseDownPos, currentMousePos);
+			}
 		}
 	}, false);
 
 	inputCanvas.addEventListener('keyup', function (e) {
 		if (e.key == "Control"){
 			action = "rocket";
+			if(mouseDownPos && currentMousePos){
+				DrawVector(inputCanvas, mouseDownPos, currentMousePos);
+			}
 		}
 	}, false);
 
