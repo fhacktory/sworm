@@ -1,5 +1,5 @@
-let WorldMaxBlockX = 20;
-let WorldMaxBlockY = 20;
+let WorldMaxBlockX = 15;
+let WorldMaxBlockY = 15;
 let MaxNewBlocks = 5;
 let TurnDelay = 5000;
 
