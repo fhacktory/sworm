@@ -118,8 +118,8 @@ function newWorld(playerPos) {
     frags: 0,
     deaths: 0,
     name: playerName,
-    x: playerPos,
-    y: 0,
+    x: playerPos.x,
+    y: playerPos.y,
   }
 
   return {
