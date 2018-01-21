@@ -591,6 +591,8 @@ var _playerShoot = function(playerName, vx, vy){
 	
 	var rocket = new Box(options);
 	gameObjects.push(rocket);
+	// ajout du vent
+	vx += (windForce / 50);
 	var vector = new b2Vec2(vx, vy);
 	rocket.addVelocity(vector);
 };
