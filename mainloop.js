@@ -13,9 +13,11 @@ function start() {
   GetWorld().then(function(state) {
     let newW = false;
 
+    let rndPlayerPos = Math.random()*MaxNewBlocks;
+
     // no available world, generate one
     if (!state || !state.world) {
-      state = newWorld();
+      state = newWorld(rndPlayerPos);
       SendWorld(state);
       newW = true;
     }
@@ -34,7 +36,7 @@ function start() {
         type: "spawn",
         time: firebase.database.ServerValue.TIMESTAMP,
         position: {
-          x: Math.random() * 100,
+          x: rndPlayerPos,
           y: 600,
         }
       }
@@ -50,16 +52,12 @@ function start() {
       GetWorld().then(function(s) {
         console.log("fill actionsQueue");
         if (!actions) {
-          console.log('?');
           return;
         }
         actionsQueue = actions;
         let keys = Object.keys(actions);
         for (key in actions) {
-          console.log(key);
           let a = actions[key];
-          console.log("state", s.time);
-          console.log("a", a.time);
           if (s.time - TurnDelay - 1000 > a.time) {
             delete actionsQueue[key];
           }
@@ -106,7 +104,7 @@ function setPlayers(state) {
   }
 }
 
-function newWorld() {
+function newWorld(playerPos) {
   console.log("newWorld()");
   let bs = [];
   for (let i = 0; i < WorldMaxBlockX; i++) {
@@ -120,7 +118,7 @@ function newWorld() {
   let players = {};
   players[playerName] = {
     name: playerName,
-    x: 1,
+    x: playerPos,
     y: 0,
   }
 
@@ -238,8 +236,9 @@ function simulate(state, action) {
       break;
   }
 
-  return state;
   console.log("simulate:", action);
+
+  return state;
 }
 
 function send(state) {
