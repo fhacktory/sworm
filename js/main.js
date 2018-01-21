@@ -544,7 +544,7 @@ var createBoxes = function () {
 			width: (boxWidth),
 			height: (boxHeight), 
 			options: {
-				density: 1,
+				density: 10,
 				friction: 10,
 				restitution: 0
 			}
