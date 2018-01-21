@@ -263,6 +263,10 @@ function simulate(state, action) {
       playerJump(action.username, mdx, mdy);
       break;
     case "spawn":
+      if (action.username === playerName) {
+        removeBlood();
+      }
+
       state.players = state.players ? state.players : {};
       state.players[action.username] = {
         x: action.x,
@@ -320,6 +324,7 @@ function send(state) {
     let players = state.players;
     let shooter = players[hit.shoot];
     let hitted  = players[hit.hit];
+    let x, y;
 
     if (shooter === hitted) {
       players[hit.shoot] = shooter;
@@ -329,11 +334,24 @@ function send(state) {
     shooter.frags += 1;
     players[hit.shoot] = shooter;
 
+    x = players[hit.hit].x;
+    y = players[hit.hit].y;
+
     delete players[hit.hit];
-    console.log(hit);
-    console.log(hit.hit);
-    console.log(players);
     state.players = players;
+
+    // respawn
+    setTimeout(function() {
+      let action = {
+        username: hit.hit,
+        type: "spawn",
+        time: firebase.database.ServerValue.TIMESTAMP,
+        x: x,
+        y: 600,
+      }
+
+      SendAction(hit.hit, action)
+    }, 500);
   }
   hitsQueue = [];
 
@@ -347,9 +365,10 @@ function send(state) {
   state.wind = wind;
   state.time = firebase.database.ServerValue.TIMESTAMP;
 
-  //PurgeActions();
   SendWorld(state);
 }
+
+
 window.playerHit = function(player_qui_a_tire, player_touche){
   hitsQueue.push({
     shoot: player_qui_a_tire,
