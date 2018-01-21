@@ -124,6 +124,9 @@ function DisplayScores(playerList){
 	$('#scoresBody').html(data);
 }
 
+function DisplayActionsQueue(actionsQueue){
+	console.log(actionsQueue);
+}
 
 joinButton.addEventListener("click", function(e){
 	if(joinButton.firstChild.data == "Quitter"){
