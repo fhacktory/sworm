@@ -234,13 +234,23 @@ var setupCollisionHandler = function(){
 			}
 		}
 		// rocket tombe sur le sol
-		if (a.type == "rocket" && a.active != false && b.type == "ground"){
+		if (a.type == "rocket" && a.active != false && (b.type == "ground" || b.type == "ground-area")){
 			a.active = false;
 			destroyObject(a);
 		}
-		if (b.type == "rocket" && b.active != false && a.type == "ground"){
+		if (b.type == "rocket" && b.active != false && (a.type == "ground" || a.type == "ground-area")){
 			b.active = false;
 			destroyObject(b);
+		}
+		// joueur sort de l'arene
+		if (a.type == "ground-area" && b.type == "player"){
+			window.playerHit(b.playerId, b.playerId);
+			destroyObject(b);
+			
+		}
+		if (b.type == "ground-area" && a.type == "player"){
+			window.playerHit(a.playerId, a.playerId);
+			destroyObject(a);
 		}
 		// joueur retomber sur le sol ou sur un wall
 		if (a.type == "player" && (b.type == "ground" || b.type == "wall")){
@@ -279,6 +289,30 @@ function createWorld() {
 		y: 10 ,
 		width: (600 * 2) ,
 		height: 19 * 2 ,
+		options: {type : b2Body.b2_staticBody}
+	}
+	var box = new Box(options);
+	gameObjects.push(box);
+	
+	var options = {
+		type: "ground-area",
+		path: "ground",
+		x: -10 ,
+		y: 200 ,
+		width: 20 ,
+		height: 1000 ,
+		options: {type : b2Body.b2_staticBody}
+	}
+	var box = new Box(options);
+	gameObjects.push(box);
+	
+	var options = {
+		type: "ground-area",
+		path: "ground",
+		x: 610 ,
+		y: 200 ,
+		width: 20 ,
+		height: 1000 ,
 		options: {type : b2Body.b2_staticBody}
 	}
 	var box = new Box(options);
