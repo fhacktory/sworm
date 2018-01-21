@@ -7,6 +7,7 @@ let firstCall = true;
 let timeout = null;
 let actionsQueue = [];
 let blocksQueue = [];
+let hitsQueue = [];
 window.windForce = 0;
 
 // start spawns the player and send the spawn action,
@@ -61,7 +62,7 @@ function start() {
         let keys = Object.keys(actions);
         for (key in actions) {
           let a = actions[key];
-          if (s.time - TurnDelay - 1000 > a.time) {
+          if (s.time - TurnDelay - 400 > a.time) {
             delete actionsQueue[key];
           }
         }
@@ -123,12 +124,21 @@ function newWorld(playerPos) {
       y: 0,
       type: "ground",
     });
+    bs.push({
+      x: i,
+      y: 1,
+      type: "ground",
+    });
+    bs.push({
+      x: i,
+      y: 2,
+      type: "ground",
+    });
   }
 
   let players = {};
   players[playerName] = {
     frags: 0,
-    deaths: 0,
     name: playerName,
     x: playerPos.x,
     y: playerPos.y,
@@ -146,13 +156,13 @@ function findPlayerPosition(state) {
 
   if (state == null) {
     return {
-      x: Math.floor(Math.random()*10),
+      x: 1+Math.floor(Math.random()*10),
       y: 600,
     };
   }
 
   for (let i = 0; i < 100; i++) {
-    let value = Math.floor(Math.random()*(WorldMaxBlockX-1));
+    let value = 1+Math.floor(Math.random()*(WorldMaxBlockX-2));
     let ok = true;
 
     for (player in state.players) {
@@ -259,7 +269,6 @@ function simulate(state, action) {
         y: action.y,
         name: action.username,
         frags: 0,
-        deaths: 0,
       };
       let options = {
         x: (action.x * boxWidth) + (boxWidth/2),
@@ -286,8 +295,49 @@ function send(state) {
   // send them to firebase
 
   // update player pos
-  // TODO(remy): player position
+  let playerPos = getPlayersPosition();
+  for (idx in playerPos) {
+    let pos = playerPos[idx];
+    let player = state.players[pos.playerId];
+    if (player) {
+      player.x = Math.floor(pos.x/30);
+      player.y = Math.floor(pos.y/30);
+      state.players[pos.playerId] = player;
+    } else {
+      let player = {
+        x: Math.floor(pos.x/30),
+        y: Math.floor(pos.y/30),
+        frags: 0,
+        name: pos.playerId,
+      }
+      state.players[pos.playerId] = player;
+    }
+  }
 
+  // update points
+  for (idx in hitsQueue) {
+    let hit = hitsQueue[idx];
+    let players = state.players;
+    let shooter = players[hit.shoot];
+    let hitted  = players[hit.hit];
+
+    if (shooter === hitted) {
+      players[hit.shoot] = shooter;
+      continue;
+    }
+
+    shooter.frags += 1;
+    players[hit.shoot] = shooter;
+
+    delete players[hit.hit];
+    console.log(hit);
+    console.log(hit.hit);
+    console.log(players);
+    state.players = players;
+  }
+  hitsQueue = [];
+
+  // save blocks position
   for (idx in blocksQueue) {
     let block = blocksQueue[idx];
     state = removeBlock(state, block.x, block.y);
@@ -300,9 +350,11 @@ function send(state) {
   //PurgeActions();
   SendWorld(state);
 }
-//TODO
 window.playerHit = function(player_qui_a_tire, player_touche){
-	console.log("playerHit", player_qui_a_tire, player_touche);
+  hitsQueue.push({
+    shoot: player_qui_a_tire,
+    hit: player_touche,
+  });
 };
 
 window.blockHit = function(x, y){
