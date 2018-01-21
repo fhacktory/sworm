@@ -103,7 +103,7 @@ function SendVector(inputCanvas, start, stop){
 	}
 	var new_action = {
 		type: action,
-		time: new Date().getTime(),
+		time: firebase.database.ServerValue.TIMESTAMP,
 		vector: [
 			start.x,
 			600 - start.y,
