@@ -124,13 +124,18 @@ function DisplayScores(playerList){
 
 
 joinButton.addEventListener("click", function(e){
-	if(playerNameInput.value == ''){
-		return;
-	}
+	if(joinButton.firstChild.data == "Quitter"){
+		leave();
+	}else{
+		if(playerNameInput.value == ''){
+			return;
+		}
 
-	playerName = playerNameInput.value;
-	createCookie(COOKIE_NAME, playerName);
-	join();
+		playerName = playerNameInput.value;
+		createCookie(COOKIE_NAME, playerName);
+		join();
+		e.preventDefault();
+	}
 });
 
 var setUpInteractivityListeners = function(){
@@ -171,9 +176,15 @@ var setUpInteractivityListeners = function(){
 var join = function (){
 	playerNameInput.value = playerName
 	playerNameInput.disabled = true;
-	joinButton.disabled = true;
 	setUpInteractivityListeners();
 	start();
+	console.log(joinButton);
+	joinButton.firstChild.data ="Quitter";
+}
+
+var leave = function(){
+	playerNameInput.value = '';
+	eraseCookie(COOKIE_NAME);
 }
 
 if(playerName){
