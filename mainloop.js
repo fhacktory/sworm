@@ -64,6 +64,7 @@ function start() {
             delete actionsQueue[key];
           }
         }
+	DisplayActionsQueue(actionsQueue);
       });
     });
     SubscribeNewWorld(function(s) {
@@ -83,7 +84,9 @@ function interrupt(state) {
   timeout = clearTimeout(timeout);
   console.log("interrupt");
 
-  window.windForce = state.wind;
+  setTimeout(function() {
+    window.windForce = state.wind;
+  }, 1000);
 
   let newState = simulation(state);
   console.log("after simulation");
