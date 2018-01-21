@@ -27,10 +27,48 @@ var ctx;
 var canvas_width;
 var canvas_height;
 var gameObjects = [];
+var clouds = [];
 var to_destroy = [];
 var boxWidth = 30;
 
 var images = {};
+
+var prepareImages = function(){
+	getCachedImage("rocket");
+	getCachedImage("player-jumping");
+	getCachedImage("player-dead");
+};
+
+var addClouds = function(){
+	var numberOfClouds = 10 + Math.round(Math.random() * 5);
+	for (var i = 0; i < numberOfClouds;i++){
+		var cloudNumber = 1;
+		var width = 114;
+		var height = 80;
+		var rand = Math.random();
+		if (rand > 0.6){
+			cloudNumber = 2;
+			width = 100;
+			height = 70;
+		}
+		if (rand > 0.8){
+			cloudNumber = 3;
+			width = 55;
+			height = 40;
+		}
+		var options = {
+			rand: Math.random(),
+			type: "cloud",
+			path: "cloud-" + cloudNumber,
+			x: (Math.random() * 700) - 100 ,
+			y: (400) + Math.random() * 200 ,
+			width: (width) ,
+			height: (height)
+		}
+		clouds.push(options);
+		
+	}
+};
 
 Math.degrees = function(radians) {
   return radians * 180 / Math.PI;
@@ -70,14 +108,27 @@ var draw_world = function (world, context) {
     ctx.fillStyle = '#333';
     ctx.fillRect(0,0, canvas_width, canvas_height);
 	
-	var background = getCachedImage("background");
-	ctx.drawImage(background, 0 , 0 , canvas_width, canvas_height);
+	var cachedImage = getCachedImage("background");
+	ctx.drawImage(cachedImage, 0 , 0 , canvas_width, canvas_height);
          
     //convert the canvas coordinate directions to cartesian
     ctx.save();
     ctx.translate(0 , canvas_height);
     ctx.scale(1 , -1);
     //world.DrawDebugData();
+	if (window.windForce !== undefined){
+		for (var i = 0, l = clouds.length; i<l; i++){
+			var cloud = clouds[i];
+			if (cloud.x > 680){
+				cloud.x = (Math.random() * - 20) - 100;
+			}
+			var cachedImage = getCachedImage(cloud.path);
+			ctx.translate(cloud.x, cloud.y);
+			ctx.drawImage(cachedImage , -cloud.width / 2 , -cloud.height / 2, cloud.width, cloud.height);
+			ctx.translate(-cloud.x, -cloud.y);
+			cloud.x += ((windForce) / 100) + (cloud.rand / 2);
+		}
+	}
 	
 	for (var i = 0, l = gameObjects.length; i<l; i++){
 		var gameObject = gameObjects[i];
@@ -447,6 +498,10 @@ var createBox = function (x, y, width, height, options) {
     fix_def.shape = new b2PolygonShape();
          
     fix_def.shape.SetAsBox( width , height );
+	
+	
+		
+	
      
     body_def.position.Set(x , y);
      
@@ -497,9 +552,9 @@ var _playerJump = function(playerName, vx, vy){
 		vx = Math.min(vx, 1.5);
 	}
 	if (vy < 0){
-		vy = Math.max(vy, 6);
+		vy = Math.max(vy, 5);
 	} else {
-		vy = Math.min(vy, 6);
+		vy = Math.min(vy, 5);
 	}
 	var vector = new b2Vec2(vx, vy);
 	player.path = "player-jumping";
@@ -544,7 +599,13 @@ var init = function(){
      
     //first create the world
     world = createWorld();
-     
+	
+	// pre-load images
+	prepareImages();
+	
+	// 
+    addClouds();
+	 
     //get internal dimensions of the canvas
     canvas_width = parseInt(canvas.attr('width'));
     canvas_height = parseInt(canvas.attr('height'));
@@ -557,6 +618,7 @@ init();
 if (window.location.href.indexOf("debug") != -1){
 	createBoxes();
 	spawnPlayers();
+	window.windForce = 30;
 }
 
 // points d'entrée
