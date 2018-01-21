@@ -236,6 +236,7 @@ function simulation(state) {
     newState = simulate(newState, action);
   }
   actionsQueue = [];
+  DisplayActionsQueue(actionsQueue);
   return newState;
 }
 
