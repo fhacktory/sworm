@@ -35,10 +35,8 @@ function start() {
         username: playerName,
         type: "spawn",
         time: firebase.database.ServerValue.TIMESTAMP,
-        position: {
-          x: rndPlayerPos,
-          y: 600,
-        }
+        x: rndPlayerPos,
+        y: 600,
       }
 
       SendAction(playerName, action)
@@ -117,6 +115,8 @@ function newWorld(playerPos) {
 
   let players = {};
   players[playerName] = {
+    frags: 0,
+    deaths: 0,
     name: playerName,
     x: playerPos,
     y: 0,
@@ -221,15 +221,15 @@ function simulate(state, action) {
     case "spawn":
       state.players = state.players ? state.players : {};
       state.players[action.username] = {
-        x: action.position.x,
-        y: action.position.y,
+        x: action.x,
+        y: action.y,
         name: action.username,
         frags: 0,
         deaths: 0,
       };
       let options = {
-        x: action.position.x * (action.position.x * boxWidth) + (boxWidth/2),
-        y: action.position.y,
+        x: action.x * (action.x * boxWidth) + (boxWidth/2),
+        y: action.y,
         playerId: action.username,
       }
       spawnPlayer(options);
