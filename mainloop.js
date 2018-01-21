@@ -233,7 +233,7 @@ function simulate(state, action) {
         deaths: 0,
       };
       let options = {
-        x: action.x * (action.x * boxWidth) + (boxWidth/2),
+        x: (action.x * boxWidth) + (boxWidth/2),
         y: action.y,
         playerId: action.username,
       }
