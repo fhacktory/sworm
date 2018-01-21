@@ -221,11 +221,16 @@ function simulation(state) {
 
 function simulate(state, action) {
   switch (action.type) {
-    //case "rocket":
-    //  let dx = (action.vector[2] - action.vector[0]) / 100;
-    //  let dy = (action.vector[3] - action.vector[1]) / 100;
-    //  playerShoot(playerName, dx, dy);
-    //  break;
+    case "rocket":
+      let dx = (action.vector[2] - action.vector[0]) / 30;
+      let dy = (action.vector[3] - action.vector[1]) / 30;
+      playerShoot(playerName, dx, dy);
+      break;
+    case "move":
+      let mdx = (action.vector[2] - action.vector[0]) / 30;
+      let mdy = (action.vector[3] - action.vector[1]) / 30;
+      playerJump(playerName, mdx, mdy);
+      break;
     case "spawn":
       state.players = state.players ? state.players : {};
       state.players[action.username] = {
