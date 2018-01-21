@@ -89,6 +89,8 @@ var draw_world = function (world, context) {
 
 
 var Box = function(options){
+	this.x = options.x;
+	this.y = options.y;
 	this.width = options.width;
 	this.height = options.height;
 	this.type = options.type;
@@ -206,11 +208,13 @@ var setupCollisionHandler = function(){
 			a.active = false;
 			destroyObject(a);
 			destroyObject(b);
+			window.blockHit(b.x, b.y);
 		}
 		if (b.type == "rocket" && b.active != false && a.type == "wall"){
 			b.active = false;
 			destroyObject(b);
 			destroyObject(a);
+			window.blockHit(a.x, a.y);
 		}
 		// rocket tombe sur un joueur
 		if (a.type == "rocket" && a.active != false && b.type == "player"){
@@ -218,6 +222,7 @@ var setupCollisionHandler = function(){
 				a.active = false;
 				destroyObject(a);
 				b.path = "player-dead";
+				window.playerHit(a.owner, b.playerId);
 			}
 		}
 		if (b.type == "rocket" && b.active != false && a.type == "player"){
@@ -225,6 +230,7 @@ var setupCollisionHandler = function(){
 				b.active = false;
 				destroyObject(b);
 				a.path = "player-dead";
+				window.playerHit(b.owner, a.playerId);
 			}
 		}
 		// rocket tombe sur le sol
@@ -451,6 +457,16 @@ var _playerJump = function(playerName, vx, vy){
 		console.error("_playerJump::Impossible de trouver le joueur '" + playerName + "'");
 		return;
 	}
+	if (vx < 0){
+		vx = Math.max(vx, -1.5);
+	} else {
+		vx = Math.min(vx, 1.5);
+	}
+	if (vy < 0){
+		vy = Math.max(vy, 6);
+	} else {
+		vy = Math.min(vy, 6);
+	}
 	var vector = new b2Vec2(vx, vy);
 	player.path = "player-jumping";
 	player.addVelocity(vector);
@@ -504,8 +520,10 @@ var init = function(){
 init();
 
 // temp
-//createBoxes();
-//spawnPlayers();
+if (window.location.href.indexOf("debug") != -1){
+	createBoxes();
+	spawnPlayers();
+}
 
 // points d'entrée
 window.playerShoot = _playerShoot;

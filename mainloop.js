@@ -275,3 +275,10 @@ function send(state) {
   //PurgeActions();
   SendWorld(state);
 }
+//TODO
+window.playerHit = function(player_qui_a_tire, player_touche){
+	console.log("playerHit", player_qui_a_tire, player_touche);
+};
+window.blockHit = function(x, y){
+	console.log("blockHit", x, y);
+};
