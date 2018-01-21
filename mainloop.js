@@ -352,7 +352,7 @@ function send(state) {
       }
 
       SendAction(hit.hit, action)
-    }, 500);
+    }, 1000);
   }
   hitsQueue = [];
 

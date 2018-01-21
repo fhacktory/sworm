@@ -46,7 +46,7 @@ var action = "rocket";
 var joinButton = document.getElementById('joinButton');
 var playerNameInput = document.getElementById('playerNameInput');
 
-let playerName = readCookie(COOKIE_NAME);
+var playerName = readCookie(COOKIE_NAME);
 
 function clearCanvas(inputCanvas) {
 	var ctx = inputCanvas.getContext('2d');
