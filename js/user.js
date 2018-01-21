@@ -127,10 +127,12 @@ var nextTurnDelay = 0;
 
 function displayNextTurnTimeout(){
 	clearCanvas(delayCanvas);
-	if(nextTurnDelay){
-		writeMessage(delayCanvas, "Next turn in " + nextTurnDelay);
-	}else {
-		writeMessage(delayCanvas, "Next turn in ...");
+	if(playerName){
+		if(nextTurnDelay){
+			writeMessage(delayCanvas, "Next turn in " + nextTurnDelay);
+		}else {
+			writeMessage(delayCanvas, "Next turn in ...");
+		}
 	}
 }
 
