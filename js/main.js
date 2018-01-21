@@ -88,6 +88,15 @@ var getCachedImage = function(path){
 	return cachedImage;
 };
 
+var playSound = function(sound){
+	var audio = new Audio("sounds/" + sound + ".mp3");
+	audio.play();
+};
+
+var getPlayersPositions = function(){
+	//TODO
+};
+
 var performDestroy = function() {
 	for (var i = 0, l = to_destroy.length; i<l; i++){
 		var o = to_destroy[i];
@@ -275,6 +284,7 @@ var setupCollisionHandler = function(){
 			if (a.owner != b.playerId){
 				a.active = false;
 				destroyObject(a);
+				playSound("Explosion1");
 				b.path = "player-dead";
 				window.playerHit(a.owner, b.playerId);
 			}
@@ -283,6 +293,7 @@ var setupCollisionHandler = function(){
 			if (b.owner != a.playerId){
 				b.active = false;
 				destroyObject(b);
+				playSound("Explosion1");
 				a.path = "player-dead";
 				window.playerHit(b.owner, a.playerId);
 			}
@@ -561,6 +572,7 @@ var _playerJump = function(playerName, vx, vy){
 	}
 	var vector = new b2Vec2(vx, vy);
 	player.path = "player-jumping";
+	playSound("WORMPOP");
 	player.addVelocity(vector);
 };
 
@@ -593,6 +605,7 @@ var _playerShoot = function(playerName, vx, vy){
 	// ajout du vent
 	vx += (windForce / 40);
 	var vector = new b2Vec2(vx, vy);
+	playSound("ROCKETRELEASE");
 	rocket.addVelocity(vector);
 };
  
