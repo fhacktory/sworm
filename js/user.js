@@ -116,8 +116,8 @@ function SendVector(inputCanvas, start, stop){
 function DisplayScores(playerList){
 	$('#scores').show();
 	var data = "";
-	for(index in playerList){
-		data += "<tr><td>" + playerList[index].username + "</td><td>" + playerList[index].frag + "</td><td>" + playerList[index].death + "</td></tr>";
+	for(username in playerList){
+		data += "<tr><td>" + username + "</td><td>" + playerList[username].frag + "</td><td>" + playerList[username].death + "</td></tr>";
 	}
 	$('#scoresBody').html(data);
 }
