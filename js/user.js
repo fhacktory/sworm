@@ -119,7 +119,7 @@ function DisplayScores(playerList){
 	$('#scores').show();
 	var data = "";
 	for(username in playerList){
-		data += "<tr><td>" + username + "</td><td>" + playerList[username].frags + "</td><td>" + playerList[username].deaths + "</td></tr>";
+		data += "<tr><td>" + username + "</td><td>" + playerList[username].frags + "</td></tr>";
 	}
 	$('#scoresBody').html(data);
 }
