@@ -317,19 +317,25 @@ function send(state) {
   // update points
   for (idx in hitsQueue) {
     let hit = hitsQueue[idx];
-    let shooter = state.players[hit.shoot];
-    let hitted  = state.players[hit.hit];
+    let players = state.players;
+    let shooter = players[hit.shoot];
+    let hitted  = players[hit.hit];
 
     if (shooter === hitted) {
-      state.players[hit.shoot] = shooter;
+      players[hit.shoot] = shooter;
       continue;
     }
 
     shooter.frags += 1;
-    state.players[hit.shoot] = shooter;
+    players[hit.shoot] = shooter;
 
-    delete state.players[hit.hitted];
+    delete players[hit.hit];
+    console.log(hit);
+    console.log(hit.hit);
+    console.log(players);
+    state.players = players;
   }
+  hitsQueue = [];
 
   // save blocks position
   for (idx in blocksQueue) {
