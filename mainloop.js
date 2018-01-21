@@ -92,9 +92,9 @@ function interrupt(state) {
   }, 1000);
 
   let newState = simulation(state);
-  console.log("after simulation");
-  console.log(newState);
-  DisplayScores(newState.players);
+  if (newState && newState.players) {
+    DisplayScores(newState.players);
+  }
 
   if (playerName == "remeh") {
     timeout = setTimeout(function() { send(newState) }, TurnDelay);
