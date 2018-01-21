@@ -332,7 +332,9 @@ function send(state) {
       continue;
     }
 
-    shooter.frags += 1;
+    if (shooter) {
+      shooter.frags += 1;
+    }
     if (players[hit.shoot]) {
       players[hit.shoot] = shooter;
     }
@@ -340,7 +342,6 @@ function send(state) {
     if (players[hit.hit]) {
       x = players[hit.hit].x;
       y = players[hit.hit].y;
-
       delete players[hit.hit];
     }
     state.players = players;
