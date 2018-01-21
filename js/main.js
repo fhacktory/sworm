@@ -122,11 +122,15 @@ var draw_world = function (world, context) {
 			if (cloud.x > 680){
 				cloud.x = (Math.random() * - 20) - 100;
 			}
+			if (cloud.x < -100){
+				cloud.x = (Math.random() * 20) + 660;
+			}
 			var cachedImage = getCachedImage(cloud.path);
 			ctx.translate(cloud.x, cloud.y);
 			ctx.drawImage(cachedImage , -cloud.width / 2 , -cloud.height / 2, cloud.width, cloud.height);
 			ctx.translate(-cloud.x, -cloud.y);
-			cloud.x += ((windForce) / 100) + (cloud.rand / 2);
+			var randAdd = windForce < 0 ? cloud.rand * -1 : cloud.rand;
+			cloud.x += ((windForce) / 100) + (randAdd / 2);
 		}
 	}
 	
