@@ -32,6 +32,8 @@ var trails = [];
 var explosions = [];
 var to_destroy = [];
 var boxWidth = 30;
+var bloodOverlay = false;
+var bloodOverlayTtl = 0;
 
 var images = {};
 
@@ -39,6 +41,7 @@ var prepareImages = function(){
 	getCachedImage("rocket");
 	getCachedImage("player-jumping");
 	getCachedImage("player-dead");
+	getCachedImage("blood");
 	for (var i = 0; i < 9;i++){
 		getCachedImage("trail-" + i);
 	}
@@ -99,6 +102,11 @@ var getCachedImage = function(path){
 var playSound = function(sound){
 	var audio = new Audio("sounds/" + sound + ".mp3");
 	audio.play();
+};
+
+var _removeBlood = function (){
+	bloodOverlay = false;
+	bloodOverlayTtl = 0;
 };
 
 var _getPlayersPositions = function(){
@@ -209,6 +217,13 @@ var draw_world = function (world, context) {
 	}
     ctx.restore();
 	
+	if (bloodOverlay){
+		bloodOverlayTtl++;
+		var cachedImage = getCachedImage("blood");
+		ctx.globalAlpha = bloodOverlayTtl / 100;
+		ctx.drawImage(cachedImage, 0 , 0 , 600, 235);
+		ctx.globalAlpha = 1;
+	}
 };
 
 
@@ -336,7 +351,6 @@ var onPlayerDeath = function(player){
 	playSound("Explosion1");
 	player.path = "player-dead";
 	var position = player.body.GetPosition();
-		
 	var x = Math.round(position.x * scale);
 	var y = Math.round(position.y * scale);
 	explosions.push({
@@ -344,6 +358,11 @@ var onPlayerDeath = function(player){
 		x: x,
 		y: y
 	});
+	var isMyself = player.playerId == window.playerName;
+	if (isMyself){
+		bloodOverlay = true;
+		bloodOverlayTtl = 0;
+	}
 	setTimeout(function(){
 		destroyObject(player);
 	}, 2 * 1000);
@@ -734,3 +753,4 @@ window.playerJump = _playerJump;
 window.addBox = _addBox;
 window.removeBox = _removeBox;
 window.getPlayersPosition = _getPlayersPositions;
+window.removeBlood = _removeBlood;
