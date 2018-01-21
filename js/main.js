@@ -287,12 +287,14 @@ var setupCollisionHandler = function(){
 		// rocket tombe sur un mur
 		if (a.type == "rocket" && a.active != false && b.type == "wall"){
 			a.active = false;
+			playSound("Explosion1");
 			destroyObject(a);
 			destroyObject(b);
 			window.blockHit(b.x, b.y);
 		}
 		if (b.type == "rocket" && b.active != false && a.type == "wall"){
 			b.active = false;
+			playSound("Explosion1");
 			destroyObject(b);
 			destroyObject(a);
 			window.blockHit(a.x, a.y);
