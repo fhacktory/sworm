@@ -125,6 +125,15 @@ function DisplayScores(playerList){
 }
 
 function DisplayActionsQueue(actionsQueue){
+	$('#actions').show();
+	var data = "";
+	for(username in actionsQueue){
+		console.log(username, actionsQueue[username]);
+		var date = new Date(actionsQueue[username].time);
+		var str_date = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + "." + date.getMilliseconds();
+		data += "<tr><td>" + username + "</td><td>" + str_date + "</td><td>" + actionsQueue[username].type + "</td></tr>";
+	}
+	$('#actionsBody').html(data);
 	console.log(actionsQueue);
 }
 
