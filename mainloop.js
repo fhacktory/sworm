@@ -226,6 +226,8 @@ function simulate(state, action) {
         x: action.position.x,
         y: action.position.y,
         name: action.username,
+	frags: 0,
+	deaths: 0,
       };
       let options = {
         x: action.position.x,
