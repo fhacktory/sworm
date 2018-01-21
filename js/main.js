@@ -61,7 +61,7 @@ var addClouds = function(){
 			type: "cloud",
 			path: "cloud-" + cloudNumber,
 			x: (Math.random() * 700) - 100 ,
-			y: (400) + Math.random() * 200 ,
+			y: (300) + Math.random() * 300 ,
 			width: (width) ,
 			height: (height)
 		}
@@ -94,7 +94,25 @@ var playSound = function(sound){
 };
 
 var getPlayersPositions = function(){
-	//TODO
+	var positions = [];
+	for (var i = 0, l = gameObjects.length; i<l; i++){
+		var gameObject = gameObjects[i];
+		if (gameObject.path != "player"){
+			continue;
+		}
+		var position = gameObject.body.GetPosition();
+		
+		var x = Math.round(position.x * scale);
+		var y = Math.round(position.y * scale);
+		var o = {
+			playerId: gameObject.playerId,
+			x: x,
+			y: y
+			
+		}
+		positions.push(o);
+	}
+	return positions;
 };
 
 var performDestroy = function() {
