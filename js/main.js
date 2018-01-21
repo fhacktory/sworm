@@ -104,7 +104,7 @@ var playSound = function(sound){
 	audio.play();
 };
 
-var getPlayersPositions = function(){
+var _getPlayersPositions = function(){
 	var positions = [];
 	for (var i = 0, l = gameObjects.length; i<l; i++){
 		var gameObject = gameObjects[i];
@@ -710,3 +710,4 @@ window.playerShoot = _playerShoot;
 window.playerJump = _playerJump;
 window.addBox = _addBox;
 window.removeBox = _removeBox;
+window.getPlayersPosition = _getPlayersPositions;
