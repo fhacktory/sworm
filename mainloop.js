@@ -13,7 +13,7 @@ function start() {
   GetWorld().then(function(state) {
     let newW = false;
 
-    let rndPlayerPos = Math.random()*MaxNewBlocks;
+    let rndPlayerPos = findPlayerPosition(state);
 
     // no available world, generate one
     if (!state || !state.world) {
@@ -35,8 +35,8 @@ function start() {
         username: playerName,
         type: "spawn",
         time: firebase.database.ServerValue.TIMESTAMP,
-        x: rndPlayerPos,
-        y: 600,
+        x: rndPlayerPos.x,
+        y: rndPlayerPos.y,
       }
 
       SendAction(playerName, action)
@@ -129,29 +129,30 @@ function newWorld(playerPos) {
   }
 }
 
-// findPosition looks for a free position
-// upon a ground (for a player or new
-// blocks).
-function findPosition(state) {
+function findPlayerPosition(state) {
+  let rv = -1;
+
+  if (state == null) {
+    return {
+      x: Math.floor(Math.random()*10),
+      y: 600,
+    };
+  }
+
   for (let x = 0; x < WorldMaxBlockX; x++) {
-    for (let y = 0; y < WorldMaxBlockY; y++) {
-      let block = getBlock(state, x, y);
-      if (block.type === 'sky') {
-        // lower bounds
-        if (y === 0) {
-          return {x: x, y: y};
-        }
-        // possible, ground under this?
-        let under = getBlock(state, x, y-1);
-        if (under.type === 'ground') {
-          return {x: x, y: y};
-        }
+    let ok = true;
+    for (player in state.players) {
+      if (player.x >= x && player.x <= (x+1)) {
+        ok = false;
+        break;
       }
+    }
+    if (ok) {
+      rv = x;
     }
   }
 
-  console.error("can't find a free position.");
-  return {x: -1, y: -1};
+  return {x: rv, y: 600};
 }
 
 // getBlock goes through the blocks of the
@@ -248,28 +249,12 @@ function send(state) {
   let sign = 1-Math.random()*2;
   let wind = sign*(Math.random()*100);
 
-  // generate some new blocks
+  // TODO(remy): generate some new blocks
 
-  let blocks_n = Math.random() * MaxNewBlocks; // max amount of blocks
-  let new_blocks = [];
-
-  for (let i = 0; i < blocks_n; i++) {
-    let pos = findPosition(state);
-    if (pos.x === -1) {
-      continue;
-    }
-    new_blocks.push({
-      type: "ground",
-      x: pos.x,
-      y: pos.y,
-    });
-  }
-
-  // wind and new_blocks contains the information the new world.
+  // wind contains the information the new world.
   // send them to firebase
 
   state.wind = wind;
-  state.new_blocks = new_blocks;
   state.time = firebase.database.ServerValue.TIMESTAMP;
 
   //PurgeActions();
