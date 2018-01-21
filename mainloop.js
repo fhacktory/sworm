@@ -6,6 +6,7 @@ let TurnDelay = 5000;
 let firstCall = true;
 let timeout = null;
 let actionsQueue = [];
+let blocksQueue = [];
 window.windForce = 0;
 
 // start spawns the player and send the spawn action,
@@ -188,6 +189,17 @@ function getBlock(state, x, y) {
   }
 }
 
+function removeBlock(state, x, y) {
+  for (idx in state.world) {
+    let b = state.world[idx];
+    if (b.x === Math.floor(x/boxWidth) && b.y === Math.floor((y-20)/boxWidth)) {
+      console.log("deleted", x, y);
+      delete state.world[idx];
+    }
+  }
+  return state;
+}
+
 function updateWorld(state) {
   for (let idx in state.world) {
     let b = state.world[idx];
@@ -269,10 +281,17 @@ function send(state) {
   let sign = 1-Math.random()*2;
   let wind = sign*(Math.random()*100);
 
-  // TODO(remy): generate some new blocks
-
   // wind contains the information the new world.
   // send them to firebase
+
+  // update player pos
+  // TODO(remy): player position
+
+  for (idx in blocksQueue) {
+    let block = blocksQueue[idx];
+    state = removeBlock(state, block.x, block.y);
+  }
+  blocksQueue = [];
 
   state.wind = wind;
   state.time = firebase.database.ServerValue.TIMESTAMP;
@@ -284,6 +303,9 @@ function send(state) {
 window.playerHit = function(player_qui_a_tire, player_touche){
 	console.log("playerHit", player_qui_a_tire, player_touche);
 };
+
 window.blockHit = function(x, y){
-	console.log("blockHit", x, y);
+  blocksQueue.push({
+    x: x, y: y,
+  });
 };
