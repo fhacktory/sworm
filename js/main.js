@@ -29,6 +29,7 @@ var canvas_height;
 var gameObjects = [];
 var clouds = [];
 var trails = [];
+var explosions = [];
 var to_destroy = [];
 var boxWidth = 30;
 
@@ -38,16 +39,12 @@ var prepareImages = function(){
 	getCachedImage("rocket");
 	getCachedImage("player-jumping");
 	getCachedImage("player-dead");
-	getCachedImage("trail-0");
-	getCachedImage("trail-1");
-	getCachedImage("trail-2");
-	getCachedImage("trail-3");
-	getCachedImage("trail-4");
-	getCachedImage("trail-5");
-	getCachedImage("trail-6");
-	getCachedImage("trail-7");
-	getCachedImage("trail-8");
-	getCachedImage("trail-9");
+	for (var i = 0; i < 9;i++){
+		getCachedImage("trail-" + i);
+	}
+	for (var i = 0; i < 13;i++){
+		getCachedImage("explosion-" + i);
+	}
 };
 
 var addClouds = function(){
@@ -172,21 +169,39 @@ var draw_world = function (world, context) {
 	}
 	
 	for (var i = 0, l = trails.length; i<l; i++){
-		var trail = trails[i];
-		if (trail.ttl > 1000){
+		var o = trails[i];
+		if (o.ttl > 1000){
 			continue;
 		}
-		var trailIndex = Math.round(trail.ttl / 3);
-		if (trailIndex < 0 || trailIndex > 9){
+		var idx = Math.round(o.ttl / 3);
+		if (idx < 0 || idx > 9){
 			continue;
 		}
-		var cachedImage = getCachedImage("trail-" + trailIndex);
-		ctx.translate(trail.x, trail.y);
-		//ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-		//ctx.fillRect(0, 0, 10, 10);
+		var cachedImage = getCachedImage("trail-" + idx);
+		ctx.translate(o.x, o.y);
 		ctx.drawImage(cachedImage, -16 / 2 , -16 / 2, 16, 16);
-		trail.ttl++;
-		ctx.translate(-trail.x, -trail.y);
+		o.ttl++;
+		ctx.translate(-o.x, -o.y);
+	}
+	for (var i = 0, l = explosions.length; i<l; i++){
+		var o = explosions[i];
+		if (o.ttl > 1500){
+			continue;
+		}
+		var idx = Math.round(o.ttl / 3);
+		if (idx < 0 || idx > 13){
+			continue;
+		}
+		var cachedImage = getCachedImage("explosion-" + idx);
+		ctx.translate(o.x, o.y);
+		//ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+		
+		//ctx.fillRect(0, 0, 10, 10);
+		var explosionWidth = 80;
+		var explosionHeight = 88;
+		ctx.drawImage(cachedImage, -explosionWidth / 2 , -explosionHeight / 2 + 20, explosionWidth, explosionHeight);
+		o.ttl++;
+		ctx.translate(-o.x, -o.y);
 	}
 	for (var i = 0, l = gameObjects.length; i<l; i++){
 		var gameObject = gameObjects[i];
@@ -320,6 +335,15 @@ var destroyObject = function(o){
 var onPlayerDeath = function(player){
 	playSound("Explosion1");
 	player.path = "player-dead";
+	var position = player.body.GetPosition();
+		
+	var x = Math.round(position.x * scale);
+	var y = Math.round(position.y * scale);
+	explosions.push({
+		ttl: 0,
+		x: x,
+		y: y
+	});
 	setTimeout(function(){
 		destroyObject(player);
 	}, 2 * 1000);
@@ -352,7 +376,6 @@ var setupCollisionHandler = function(){
 				a.active = false;
 				destroyObject(a);
 				onPlayerDeath(b);
-
 				window.playerHit(a.owner, b.playerId);
 			}
 		}
