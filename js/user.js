@@ -39,6 +39,7 @@ const COOKIE_NAME = "swormPlayerName";
 var inputCanvas = document.getElementById('inputCanvas');
 var context = inputCanvas.getContext('2d');
 var mouseDownPos = null;
+var currentMousePos = null;
 var action = "rocket";
 
 var joinButton = document.getElementById('joinButton');
@@ -102,7 +103,7 @@ function SendVector(inputCanvas, start, stop){
 	}
 	var new_action = {
 		type: action,
-		time: new Date().getTime(),
+		time: firebase.database.ServerValue.TIMESTAMP,
 		vector: [
 			start.x,
 			600 - start.y,
@@ -124,13 +125,18 @@ function DisplayScores(playerList){
 
 
 joinButton.addEventListener("click", function(e){
-	if(playerNameInput.value == ''){
-		return;
-	}
+	if(joinButton.firstChild.data == "Quitter"){
+		leave();
+	}else{
+		if(playerNameInput.value == ''){
+			return;
+		}
 
-	playerName = playerNameInput.value;
-	createCookie(COOKIE_NAME, playerName);
-	join();
+		playerName = playerNameInput.value;
+		createCookie(COOKIE_NAME, playerName);
+		join();
+		e.preventDefault();
+	}
 });
 
 var setUpInteractivityListeners = function(){
@@ -143,23 +149,31 @@ var setUpInteractivityListeners = function(){
 		if(mouseDownPos == null){
 			return;
 		}
-		DrawVector(inputCanvas, mouseDownPos, getMousePos(inputCanvas, evt));
+		currentMousePos = getMousePos(inputCanvas, evt);
+		DrawVector(inputCanvas, mouseDownPos, currentMousePos);
 	}, false);
 
 	inputCanvas.addEventListener('mouseup', function(evt) {
 		SendVector(inputCanvas, mouseDownPos, getMousePos(inputCanvas, evt));
 		mouseDownPos = null;
+		currentMousePos = null;
 	}, false);
 
 	inputCanvas.addEventListener('keydown', function (e) {
 		if (e.key == "Control"){
 			action = "move";
+			if(mouseDownPos && currentMousePos){
+				DrawVector(inputCanvas, mouseDownPos, currentMousePos);
+			}
 		}
 	}, false);
 
 	inputCanvas.addEventListener('keyup', function (e) {
 		if (e.key == "Control"){
 			action = "rocket";
+			if(mouseDownPos && currentMousePos){
+				DrawVector(inputCanvas, mouseDownPos, currentMousePos);
+			}
 		}
 	}, false);
 
@@ -171,9 +185,16 @@ var setUpInteractivityListeners = function(){
 var join = function (){
 	playerNameInput.value = playerName
 	playerNameInput.disabled = true;
-	joinButton.disabled = true;
 	setUpInteractivityListeners();
 	start();
+	console.log(joinButton);
+	joinButton.firstChild.data ="Quitter";
+}
+
+var leave = function(){
+	playerName = '';
+	playerNameInput.value = '';
+	eraseCookie(COOKIE_NAME);
 }
 
 if(playerName){
