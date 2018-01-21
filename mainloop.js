@@ -91,7 +91,7 @@ function setPlayers(state) {
   for (idx in state.players) {
     let player = state.players[idx];
 
-		var x = player.x * (boxWidth * 2) + boxWidth
+		var x = player.x * (boxWidth) + boxWidth/2;
 		var options = {
 			playerId: player.name,
 			x: x,
@@ -105,7 +105,7 @@ function setPlayers(state) {
 function newWorld(playerPos) {
   console.log("newWorld()");
   let bs = [];
-  for (let i = 0; i < WorldMaxBlockX; i++) {
+  for (let i = 0; i < 20; i++) {
     bs.push({
       x: i,
       y: 0,
@@ -139,16 +139,20 @@ function findPlayerPosition(state) {
     };
   }
 
-  for (let x = 0; x < WorldMaxBlockX; x++) {
+  for (let i = 0; i < 100; i++) {
+    let value = Math.floor(Math.random()*(WorldMaxBlockX-1));
     let ok = true;
+
     for (player in state.players) {
-      if (player.x >= x && player.x <= (x+1)) {
+      if (player.x >= value && player.x <= (value+1)) {
         ok = false;
         break;
       }
     }
+
     if (ok) {
-      rv = x;
+      rv = value;
+      break;
     }
   }
 
