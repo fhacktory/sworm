@@ -28,6 +28,7 @@ var canvas_width;
 var canvas_height;
 var gameObjects = [];
 var clouds = [];
+var trails = [];
 var to_destroy = [];
 var boxWidth = 30;
 
@@ -37,6 +38,16 @@ var prepareImages = function(){
 	getCachedImage("rocket");
 	getCachedImage("player-jumping");
 	getCachedImage("player-dead");
+	getCachedImage("trail-0");
+	getCachedImage("trail-1");
+	getCachedImage("trail-2");
+	getCachedImage("trail-3");
+	getCachedImage("trail-4");
+	getCachedImage("trail-5");
+	getCachedImage("trail-6");
+	getCachedImage("trail-7");
+	getCachedImage("trail-8");
+	getCachedImage("trail-9");
 };
 
 var addClouds = function(){
@@ -160,6 +171,23 @@ var draw_world = function (world, context) {
 		}
 	}
 	
+	for (var i = 0, l = trails.length; i<l; i++){
+		var trail = trails[i];
+		if (trail.ttl > 1000){
+			continue;
+		}
+		var trailIndex = Math.round(trail.ttl / 3);
+		if (trailIndex < 0 || trailIndex > 9){
+			continue;
+		}
+		var cachedImage = getCachedImage("trail-" + trailIndex);
+		ctx.translate(trail.x, trail.y);
+		//ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+		//ctx.fillRect(0, 0, 10, 10);
+		ctx.drawImage(cachedImage, -16 / 2 , -16 / 2, 16, 16);
+		trail.ttl++;
+		ctx.translate(-trail.x, -trail.y);
+	}
 	for (var i = 0, l = gameObjects.length; i<l; i++){
 		var gameObject = gameObjects[i];
 		gameObject.draw();
@@ -202,7 +230,18 @@ Box.prototype.draw = function(){
 	var bodyAngle = this.body.GetAngle();
 	ctx.rotate(bodyAngle);
 	ctx.drawImage(cachedImage , -width / 2 , -height / 2, width, height);
+	if (this.type == "rocket"){
+		// trail
+		if (Math.round(sx) % 3 == 0){
+			trails.push({
+				ttl: 0,
+				x: sx,
+				y: sy
+			});
+		}
+	}
 	ctx.rotate(-bodyAngle);
+	
 	if (this.type == "player"){
 		var textSize = this.playerId.length * 5;
 		var textTranslateX = -textSize;
@@ -278,6 +317,14 @@ var destroyObject = function(o){
 	to_destroy.push(o);
 };
 
+var onPlayerDeath = function(player){
+	playSound("Explosion1");
+	player.path = "player-dead";
+	setTimeout(function(){
+		destroyObject(player);
+	}, 2 * 1000);
+};
+
 var setupCollisionHandler = function(){
 	
 	b2ContactListener.prototype.BeginContact = function (contact) {
@@ -304,8 +351,8 @@ var setupCollisionHandler = function(){
 			if (a.owner != b.playerId){
 				a.active = false;
 				destroyObject(a);
-				playSound("Explosion1");
-				b.path = "player-dead";
+				onPlayerDeath(b);
+
 				window.playerHit(a.owner, b.playerId);
 			}
 		}
@@ -313,8 +360,7 @@ var setupCollisionHandler = function(){
 			if (b.owner != a.playerId){
 				b.active = false;
 				destroyObject(b);
-				playSound("Explosion1");
-				a.path = "player-dead";
+				onPlayerDeath(a);
 				window.playerHit(b.owner, a.playerId);
 			}
 		}
