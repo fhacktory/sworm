@@ -183,6 +183,7 @@ var join = function (){
 }
 
 var leave = function(){
+	playerName = '';
 	playerNameInput.value = '';
 	eraseCookie(COOKIE_NAME);
 }
