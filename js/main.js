@@ -423,11 +423,15 @@ var setupCollisionHandler = function(){
 			destroyObject(a);
 		}
 		// joueur retomber sur le sol ou sur un wall
-		if (a.type == "player" && (b.type == "ground" || b.type == "wall")){
-			a.path = "player";
+		if (a.type == "player" && (b.type == "ground" || b.type == "wall" || b.type == "player")){
+			if (a.path != "player-dead"){
+				a.path = "player";
+			}
 		}
-		if (b.type == "player" && (a.type == "ground" || a.type == "wall")){
-			b.path = "player";
+		if (b.type == "player" && (a.type == "ground" || a.type == "wall" || a.type == "player")){
+			if (b.path != "player-dead"){
+				b.path = "player";
+			}
 		}
 	}
 };
