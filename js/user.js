@@ -104,6 +104,7 @@ function SendVector(inputCanvas, start, stop){
 	var new_action = {
 		type: action,
 		time: firebase.database.ServerValue.TIMESTAMP,
+    username: playerName,
 		vector: [
 			start.x,
 			600 - start.y,
