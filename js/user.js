@@ -125,6 +125,10 @@ function DisplayScores(playerList){
 }
 
 function DisplayActionsQueue(actionsQueue){
+	if(Object.keys(actionsQueue).length == 0){
+		$('#actions').hide();
+		return
+	}
 	$('#actions').show();
 	var data = "";
 	for(username in actionsQueue){
@@ -134,7 +138,6 @@ function DisplayActionsQueue(actionsQueue){
 		data += "<tr><td>" + username + "</td><td>" + str_date + "</td><td>" + actionsQueue[username].type + "</td></tr>";
 	}
 	$('#actionsBody').html(data);
-	console.log(actionsQueue);
 }
 
 joinButton.addEventListener("click", function(e){
