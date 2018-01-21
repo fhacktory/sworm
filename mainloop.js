@@ -256,16 +256,24 @@ function simulate(state, action) {
     case "rocket":
       let dx = (action.vector[2] - action.vector[0]) / 30;
       let dy = (action.vector[3] - action.vector[1]) / 30;
-      playerShoot(action.username, dx, dy);
+      if (state.players[action.username]) {
+        playerShoot(action.username, dx, dy);
+      }
       break;
     case "move":
       let mdx = (action.vector[2] - action.vector[0]) / 30;
       let mdy = (action.vector[3] - action.vector[1]) / 30;
-      playerJump(action.username, mdx, mdy);
+      if (state.players[action.username]) {
+        playerJump(action.username, mdx, mdy);
+      }
       break;
     case "spawn":
       if (action.username === playerName) {
         removeBlood();
+      }
+
+      if (state.players[action.username]) {
+        break;
       }
 
       state.players = state.players ? state.players : {};
