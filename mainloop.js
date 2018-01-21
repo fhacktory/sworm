@@ -224,11 +224,11 @@ function simulate(state, action) {
         x: action.position.x,
         y: action.position.y,
         name: action.username,
-	frags: 0,
-	deaths: 0,
+        frags: 0,
+        deaths: 0,
       };
       let options = {
-        x: action.position.x,
+        x: action.position.x * (b.x * boxWidth) + (boxWidth/2),
         y: action.position.y,
         playerId: action.username,
       }
