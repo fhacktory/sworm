@@ -42,9 +42,10 @@ function start() {
       SendAction(playerName, action)
     }
 
-    timeout = setTimeout(function() { send(state) }, TurnDelay);
+    if (playerName === "remeh") {
+      timeout = setTimeout(function() { send(state) }, TurnDelay);
+    }
 
-    console.log("created timeout", timeout);
     SubscribeActions(function(actions) {
       // we need to get the state to have its time
       GetWorld().then(function(s) {
@@ -84,7 +85,9 @@ function interrupt(state) {
   console.log(newState);
   DisplayScores(newState.players);
 
-  timeout = setTimeout(function() { send(newState) }, TurnDelay);
+  if (playerName == "remeh") {
+    timeout = setTimeout(function() { send(newState) }, TurnDelay);
+  }
 }
 
 function setPlayers(state) {
