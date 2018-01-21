@@ -119,10 +119,9 @@ var draw_world = function (world, context) {
 	if (window.windForce !== undefined){
 		for (var i = 0, l = clouds.length; i<l; i++){
 			var cloud = clouds[i];
-			if (cloud.x > 680){
+			if (cloud.x > 690){
 				cloud.x = (Math.random() * - 20) - 100;
-			}
-			if (cloud.x < -100){
+			} else if (cloud.x < -150){
 				cloud.x = (Math.random() * 20) + 660;
 			}
 			var cachedImage = getCachedImage(cloud.path);
@@ -592,7 +591,7 @@ var _playerShoot = function(playerName, vx, vy){
 	var rocket = new Box(options);
 	gameObjects.push(rocket);
 	// ajout du vent
-	vx += (windForce / 50);
+	vx += (windForce / 40);
 	var vector = new b2Vec2(vx, vy);
 	rocket.addVelocity(vector);
 };
