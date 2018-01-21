@@ -64,6 +64,7 @@ function start() {
             delete actionsQueue[key];
           }
         }
+	DisplayActionsQueue(actionsQueue);
       });
     });
     SubscribeNewWorld(function(s) {
