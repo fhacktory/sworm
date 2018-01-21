@@ -83,6 +83,7 @@ function start() {
 }
 
 function interrupt(state) {
+  SetNextTurnTimeout(TurnDelay);
   timeout = clearTimeout(timeout);
   console.log("interrupt");
 

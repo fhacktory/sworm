@@ -37,6 +37,7 @@ const COOKIE_NAME = "swormPlayerName";
 
 
 var inputCanvas = document.getElementById('inputCanvas');
+var delayCanvas = document.getElementById('delayCanvas');
 var context = inputCanvas.getContext('2d');
 var mouseDownPos = null;
 var currentMousePos = null;
@@ -47,7 +48,7 @@ var playerNameInput = document.getElementById('playerName');
 
 let playerName = readCookie(COOKIE_NAME);
 
-function clearCanvas(inputCanvas, message) {
+function clearCanvas(inputCanvas) {
 	var ctx = inputCanvas.getContext('2d');
 	ctx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
 }
@@ -113,6 +114,35 @@ function SendVector(inputCanvas, start, stop){
 		]
 	}
 	SendAction(playerName, new_action);
+}
+
+function writeMessage(canvas, message){
+	var context = canvas.getContext('2d');
+	context.font = '18pt sans-serif';
+	context.fillStyle = "#00000099";
+	context.fillText(message, 10, 25);
+}
+
+var nextTurnDelay = 0;
+
+function displayNextTurnTimeout(){
+	clearCanvas(delayCanvas);
+	if(nextTurnDelay){
+		writeMessage(delayCanvas, "Next turn in " + nextTurnDelay);
+	}else {
+		writeMessage(delayCanvas, "Next turn in ...");
+	}
+}
+
+setInterval(function(){
+	if(nextTurnDelay > 0){
+		nextTurnDelay--;
+	}
+	displayNextTurnTimeout();
+}, 1000);
+
+function SetNextTurnTimeout(TurnDelay) {
+	nextTurnDelay = TurnDelay/1000;
 }
 
 function DisplayScores(playerList){
