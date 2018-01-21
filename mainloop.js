@@ -333,12 +333,16 @@ function send(state) {
     }
 
     shooter.frags += 1;
-    players[hit.shoot] = shooter;
+    if (players[hit.shoot) {
+      players[hit.shoot] = shooter;
+    }
 
-    x = players[hit.hit].x;
-    y = players[hit.hit].y;
+    if (players[hit.hit]) {
+      x = players[hit.hit].x;
+      y = players[hit.hit].y;
 
-    delete players[hit.hit];
+      delete players[hit.hit];
+    }
     state.players = players;
 
     // respawn
