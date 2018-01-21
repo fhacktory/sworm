@@ -202,9 +202,6 @@ var draw_world = function (world, context) {
 		}
 		var cachedImage = getCachedImage("explosion-" + idx);
 		ctx.translate(o.x, o.y);
-		//ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-		
-		//ctx.fillRect(0, 0, 10, 10);
 		var explosionWidth = 80;
 		var explosionHeight = 88;
 		ctx.drawImage(cachedImage, -explosionWidth / 2 , -explosionHeight / 2 + 20, explosionWidth, explosionHeight);
@@ -544,11 +541,11 @@ var createBoxes = function () {
 			path: "wall",
 			x: x,
 			y: y,
-			width: (boxWidth - 1),
-			height: (boxHeight - 1), 
+			width: (boxWidth),
+			height: (boxHeight), 
 			options: {
 				density: 1,
-				friction: 1,
+				friction: 10,
 				restitution: 0
 			}
 		};

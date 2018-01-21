@@ -43,7 +43,7 @@ var currentMousePos = null;
 var action = "rocket";
 
 var joinButton = document.getElementById('joinButton');
-var playerNameInput = document.getElementById('playerName');
+var playerNameInput = document.getElementById('playerNameInput');
 
 let playerName = readCookie(COOKIE_NAME);
 
