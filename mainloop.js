@@ -333,7 +333,7 @@ function send(state) {
     }
 
     shooter.frags += 1;
-    if (players[hit.shoot) {
+    if (players[hit.shoot]) {
       players[hit.shoot] = shooter;
     }
 
