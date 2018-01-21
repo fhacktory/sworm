@@ -24,6 +24,7 @@ function start() {
     setWorld(state);
     // display the players
     setPlayers(state);
+    DisplayScores(state.players);
 
     // sends the spawn action to firebase
     // if we're spawning
@@ -80,11 +81,12 @@ function start() {
 
 function interrupt(state) {
   timeout = clearTimeout(timeout);
+  console.log("interrupt");
 
   let newState = simulation(state);
   console.log("after simulation");
-  console.log(state);
-  console.log("interrupt");
+  console.log(newState);
+  DisplayScores(newState.players);
 
   timeout = setTimeout(function() { send(newState) }, TurnDelay);
 }
