@@ -6,6 +6,7 @@ let TurnDelay = 5000;
 let firstCall = true;
 let timeout = null;
 let actionsQueue = [];
+let windForce = 0;
 
 // start spawns the player and send the spawn action,
 // then, starts the mainloop waiting for its turn.
@@ -20,6 +21,8 @@ function start() {
       state = newWorld(rndPlayerPos);
       SendWorld(state);
       newW = true;
+    } else {
+      windForce = state.wind;
     }
 
     // display the world
@@ -79,6 +82,8 @@ function start() {
 function interrupt(state) {
   timeout = clearTimeout(timeout);
   console.log("interrupt");
+
+  windForce = state.wind;
 
   let newState = simulation(state);
   console.log("after simulation");
