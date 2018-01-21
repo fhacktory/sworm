@@ -61,7 +61,7 @@ var addClouds = function(){
 			type: "cloud",
 			path: "cloud-" + cloudNumber,
 			x: (Math.random() * 700) - 100 ,
-			y: (400) + Math.random() * 200 ,
+			y: (300) + Math.random() * 300 ,
 			width: (width) ,
 			height: (height)
 		}
@@ -86,6 +86,33 @@ var getCachedImage = function(path){
 		images[path] = cachedImage;
 	}
 	return cachedImage;
+};
+
+var playSound = function(sound){
+	var audio = new Audio("sounds/" + sound + ".mp3");
+	audio.play();
+};
+
+var getPlayersPositions = function(){
+	var positions = [];
+	for (var i = 0, l = gameObjects.length; i<l; i++){
+		var gameObject = gameObjects[i];
+		if (gameObject.path != "player"){
+			continue;
+		}
+		var position = gameObject.body.GetPosition();
+		
+		var x = Math.round(position.x * scale);
+		var y = Math.round(position.y * scale);
+		var o = {
+			playerId: gameObject.playerId,
+			x: x,
+			y: y
+			
+		}
+		positions.push(o);
+	}
+	return positions;
 };
 
 var performDestroy = function() {
@@ -275,6 +302,7 @@ var setupCollisionHandler = function(){
 			if (a.owner != b.playerId){
 				a.active = false;
 				destroyObject(a);
+				playSound("Explosion1");
 				b.path = "player-dead";
 				window.playerHit(a.owner, b.playerId);
 			}
@@ -283,6 +311,7 @@ var setupCollisionHandler = function(){
 			if (b.owner != a.playerId){
 				b.active = false;
 				destroyObject(b);
+				playSound("Explosion1");
 				a.path = "player-dead";
 				window.playerHit(b.owner, a.playerId);
 			}
@@ -561,6 +590,7 @@ var _playerJump = function(playerName, vx, vy){
 	}
 	var vector = new b2Vec2(vx, vy);
 	player.path = "player-jumping";
+	playSound("WORMPOP");
 	player.addVelocity(vector);
 };
 
@@ -593,6 +623,7 @@ var _playerShoot = function(playerName, vx, vy){
 	// ajout du vent
 	vx += (windForce / 40);
 	var vector = new b2Vec2(vx, vy);
+	playSound("ROCKETRELEASE");
 	rocket.addVelocity(vector);
 };
  
